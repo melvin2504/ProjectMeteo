@@ -5,7 +5,7 @@ import requests
 from datetime import datetime
 
 # You only need to uncomment the line below if you want to run your flask app locally.
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = './lab-test-1-415115-c2f0b755d8b4.json'
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = ""
 client = bigquery.Client(project="lab-test-1-415115")
 
 
