@@ -16,25 +16,22 @@ YOUR_HASH_PASSWD = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f
 app = Flask(__name__)
 
 OPENWEATHER_API_KEY = "6b85e31b08c576ddd0a8f6a60e5afc01"
-OPENWEATHER_URL = "https://api.openweathermap.org/data/3.0/weather"
 
 
-def get_outdoor_weather(city):
-    """Fetch outdoor temperature and humidity data from OpenWeather API for a given city."""
-    params = {
-        'q': city,
-        'appid': OPENWEATHER_API_KEY,
-        'units': 'metric'  # Use 'imperial' for Fahrenheit
-    }
-    response = requests.get(OPENWEATHER_URL, params=params)
-    if response.status_code == 200:
-        data = response.json()
-        return {
-            "outdoor_temp": data['main']['temp'],
-            "outdoor_humidity": data['main']['humidity']
-        }
-    else:
-        raise Exception("Failed to fetch weather data")
+def get_weather(api_key, city):
+    """Fetches the current weather for a specified city using OpenWeatherMap's API."""
+    try:
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception if the request was unsuccessful
+        data = response.json()  # Convert the response to JSON
+        temperature = data['main']['temp']
+        humidity = data['main']['humidity']
+        description = data['weather'][0]['description']
+        return temperature, humidity, description
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
 
 # get the column names of the db
 # PROJECT_ID.DATASET_ID.weather-records
@@ -44,36 +41,41 @@ SELECT * FROM `lab-test-1-415115.weather_IoT_data.weather-records` LIMIT 10
 query_job = client.query(q)
 df = query_job.to_dataframe()
 
-@app.route('/send-to-bigquery', methods=['GET', 'POST'])
+@app.route('/send-to-bigquery', methods=['POST'])
 def send_to_bigquery():
-    if request.method == 'POST':
-        if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
-            raise Exception("Incorrect Password!")
-        data = request.get_json(force=True)["values"]
+    # Check for correct password in the POST request
+    if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
 
-        
-        weather_data = get_outdoor_weather("Lausanne")
-        data.update(weather_data)
+    # Fetch the weather data
+    city = "Lausanne"
+    weather_data = get_weather(OPENWEATHER_API_KEY, city)
+    if weather_data is None:
+        return jsonify({"error": "Failed to fetch weather data"}), 500
 
-        
-        q = """INSERT INTO `lab-test-1-415115.weather_IoT_data.weather-records` 
-        """
-        names = """"""
-        values = """"""
-        for k, v in data.items():
-            names += f"""{k},"""
-            if df.dtypes[k] == float:
-                values += f"""{v},"""
-            else:
-                # string values in the query should be in single qutation!
-                values += f"""'{v}',"""
-        # remove the last comma
-        names = names[:-1]
-        values = values[:-1]
-        q = q + f""" ({names})""" + f""" VALUES({values})"""
-        query_job = client.query(q)
-        return {"status": "sucess", "data": data}
-    return {"status": "failed"}
+    # Extracting the weather data
+    temperature, humidity, description = weather_data
+    data = request.get_json(force=True)["values"]
+    data.update({
+        "outdoor_temp": temperature,
+        "outdoor_humidity": humidity,
+        "outdoor_weather": description
+    })
+
+    # Prepare the query to insert data into BigQuery
+    fields = ', '.join(data.keys())
+    values = ', '.join([f"'{v}'" if isinstance(v, str) else str(v) for v in data.values()])
+    
+    query = f"""
+    INSERT INTO `lab-test-1-415115.weather_IoT_data.weather-records` ({fields})
+    VALUES ({values})
+    """
+    try:
+        query_job = client.query(query)
+        query_job.result()  # Wait for the query job to complete
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
         
 
 @app.route('/get_outdoor_weather', methods=['POST'])
@@ -82,29 +84,28 @@ def get_outdoor_weather():
     if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
     
-    # Query to select the latest outdoor temperature and humidity records
+    # Query to select the latest outdoor temperature, humidity, and description records
     query = """
     SELECT outdoor_temp, outdoor_humidity
     FROM `lab-test-1-415115.weather_IoT_data.weather-records`
     ORDER BY timestamp DESC
     LIMIT 1
     """
-    query_job = client.query(query)
-    results = query_job.result()
+    try:
+        query_job = client.query(query)  # Execute the query
+        results = query_job.result()  # Wait for results
 
-    # Extract data from query results
-    data = []
-    for row in results:
-        data.append({
-            "outdoor_temp": row.outdoor_temp,
-            "outdoor_humidity": row.outdoor_humidity
-        })
-    
-    # Return the latest outdoor weather data
-    if data:
-        return jsonify(data[0])
-    else:
-        return jsonify({"error": "No data available"}), 404
+        # Extract data from query results
+        row = next(iter(results), None)  # Get the first result if available
+        if row:
+            return jsonify({
+                "outdoor_temp": row.outdoor_temp,
+                "outdoor_humidity": row.outdoor_humidity
+            })
+        else:
+            return jsonify({"error": "No data available"}), 404
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
