@@ -76,13 +76,35 @@ def send_to_bigquery():
     return {"status": "failed"}
         
 
-# For exercise 3: Complete the following endpoint.
-# @app.route('/get_outdoor_weather', methods=['GET', 'POST'])
-# def get_outdoor_weather():
-#     if request.method == 'POST':
-#         if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
-#             raise Exception("Incorrect Password!")
-#         # get the latest outdoor temp values from the db
+@app.route('/get_outdoor_weather', methods=['POST'])
+def get_outdoor_weather():
+    # Verify password from the request
+    if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
+    
+    # Query to select the latest outdoor temperature and humidity records
+    query = """
+    SELECT outdoor_temp, outdoor_humidity
+    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
+    ORDER BY timestamp DESC
+    LIMIT 1
+    """
+    query_job = client.query(query)
+    results = query_job.result()
+
+    # Extract data from query results
+    data = []
+    for row in results:
+        data.append({
+            "outdoor_temp": row.outdoor_temp,
+            "outdoor_humidity": row.outdoor_humidity
+        })
+    
+    # Return the latest outdoor weather data
+    if data:
+        return jsonify(data[0])
+    else:
+        return jsonify({"error": "No data available"}), 404
 
 
 if __name__ == '__main__':
