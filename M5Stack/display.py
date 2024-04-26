@@ -26,13 +26,16 @@ def get_datetime_strings():
     time_string = "{:02}:{:02}:{:02}".format(dt[4], dt[5], dt[6])
     return date_string, time_string
     
+passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"  
+
 def fetch_outdoor_weather():
-    url = 'https://flaskapp3-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+    url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/get_outdoor_weather'
     headers = {'Content-Type': 'application/json'}
-    response = urequests.post(url, json={"passwd": passwd_hash})
+    response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
     if response.status_code == 200:
         return response.json()
     else:
+        print("Failed to fetch weather data: ", response.status_code)
         return None
 
 # Display labels for date, time, temperature, and humidity
@@ -49,18 +52,23 @@ passwd = "vendgelanonoarnaknonoob"
 h = hashlib.sha256(passwd.encode('utf-8'))
 passwd_hash = binascii.hexlify(h.digest()).decode('utf-8')
 
+outdoor_weather_flag = 600  # Fetch outdoor weather every 10 minutes
+
 while True:
     date_string, time_string = get_datetime_strings()
-    #outdoor_weather = fetch_outdoor_weather()
+    if outdoor_weather_flag >= 600:
+        outdoor_weather = fetch_outdoor_weather()
+        if outdoor_weather:
+            label2.set_text(str(round(outdoor_weather['outdoor_temp'])) + " °C")
+            label3.set_text(str(round(outdoor_weather['outdoor_humidity'])) + " %")
+        outdoor_weather_flag = 0  # Reset the counter
+
+    outdoor_weather_flag += 1
     
     date_label.set_text('Date: ' + date_string)
     time_label.set_text('Time: ' + time_string)
     label0.set_text(str(round(env3_0.temperature)) + " °C")
     label1.set_text(str(round(env3_0.humidity)) + " %")
-    
-    #if outdoor_weather:
-    #    label2.set_text(str(round(outdoor_weather['outdoor_temp'])) + " °C")
-     #   label3.set_text(str(round(outdoor_weather['outdoor_humidity'])) + " %")
 
     # Send data every 2 minutes
     if temp_flag >= 120:
@@ -73,7 +81,12 @@ while True:
                 "indoor_humidity": round(env3_0.humidity)
             }
         }
-        urequests.post("https://flaskapp3-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
+        urequests.post("https://flaskapp4-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
+
+
+
+
+
