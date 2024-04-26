@@ -40,13 +40,13 @@ def fetch_outdoor_weather():
 
 # Display labels for date, time, temperature, and humidity
 date_label = M5Label('Date', x=19, y=40, color=0x000, font=FONT_MONT_18, parent=None)
-time_label = M5Label('Time:', x=19, y=80, color=0x000, font=FONT_MONT_18, parent=None)
-Temp = M5Label('Temp:', x=19, y=142, color=0x000, font=FONT_MONT_22, parent=None)
-Humidity = M5Label('Humidity:', x=19, y=183, color=0x000, font=FONT_MONT_22, parent=None)
-label0 = M5Label('T', x=163, y=142, color=0x000, font=FONT_MONT_22, parent=None)
-label1 = M5Label('H', x=158, y=183, color=0x000, font=FONT_MONT_22, parent=None)
-label2 = M5Label('OT', x=233, y=142, color=0x000, font=FONT_MONT_22, parent=None)
-label3 = M5Label('OH', x=228, y=183, color=0x000, font=FONT_MONT_22, parent=None)
+time_label = M5Label('Time', x=230, y=40, color=0x000, font=FONT_MONT_18, parent=None)
+temperature_icon = M5Img('res/icons8-temperature-32.png', x=19, y=135, parent=None)
+humidity_icon = M5Img('res/icons8-humidity-32.png', x=19, y=180, parent=None)
+label0 = M5Label('T', x=63, y=142, color=0x000, font=FONT_MONT_22, parent=None)
+label1 = M5Label('H', x=63, y=183, color=0x000, font=FONT_MONT_22, parent=None)
+label2 = M5Label('OT', x=143, y=142, color=0x000, font=FONT_MONT_22, parent=None)
+label3 = M5Label('OH', x=143, y=183, color=0x000, font=FONT_MONT_22, parent=None)
 
 passwd = "vendgelanonoarnaknonoob"
 h = hashlib.sha256(passwd.encode('utf-8'))
@@ -59,16 +59,16 @@ while True:
     if outdoor_weather_flag >= 600:
         outdoor_weather = fetch_outdoor_weather()
         if outdoor_weather:
-            label2.set_text(str(round(outdoor_weather['outdoor_temp'])) + " °C")
-            label3.set_text(str(round(outdoor_weather['outdoor_humidity'])) + " %")
+            label2.set_text(str(round(outdoor_weather['outdoor_temp'])) + "°C")
+            label3.set_text(str(round(outdoor_weather['outdoor_humidity'])) + "%")
         outdoor_weather_flag = 0  # Reset the counter
 
     outdoor_weather_flag += 1
     
-    date_label.set_text('Date: ' + date_string)
-    time_label.set_text('Time: ' + time_string)
-    label0.set_text(str(round(env3_0.temperature)) + " °C")
-    label1.set_text(str(round(env3_0.humidity)) + " %")
+    date_label.set_text(date_string)
+    time_label.set_text(time_string)
+    label0.set_text(str(round(env3_0.temperature)) + "°C")
+    label1.set_text(str(round(env3_0.humidity)) + "%")
 
     # Send data every 2 minutes
     if temp_flag >= 120:
@@ -85,8 +85,5 @@ while True:
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
-
-
-
 
 
