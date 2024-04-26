@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import os
 from google.cloud import bigquery
 import requests
@@ -88,8 +88,7 @@ def get_outdoor_weather():
     query = """
     SELECT outdoor_temp, outdoor_humidity
     FROM `lab-test-1-415115.weather_IoT_data.weather-records`
-    ORDER BY timestamp DESC
-    LIMIT 1
+    ORDER BY date desc, time desc limit 1
     """
     try:
         query_job = client.query(query)  # Execute the query
