@@ -99,7 +99,7 @@ def get_outdoor_weather():
         if row:
             return jsonify({
                 "outdoor_temp": row.outdoor_temp,
-                "outdoor_humidity": row.outdoor_humidity
+                "outdoor_humidity": row.outdoor_humidity,
                 "outdoor_weather": row.outdoor_weather
             })
         else:
