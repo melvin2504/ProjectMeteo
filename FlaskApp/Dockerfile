@@ -11,9 +11,6 @@ RUN apt-get update && apt-get install -y \
 COPY ./main.py ./
 COPY ./requirements.txt ./
 
-# Set the environment variable PORT
-ENV PORT 8080
-
 RUN pip3 install -r requirements.txt
 
 
