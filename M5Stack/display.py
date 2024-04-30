@@ -13,10 +13,17 @@ screen = M5Screen()
 screen.clean_screen()
 screen.set_screen_bg_color(0xd5d5d5)
 env3_0 = unit.get(unit.ENV3, unit.PORTA)
+motion_sensor = unit.get(unit.PIR, unit.PORTB)
 temp_flag = 300
 
 # Set up the RTC to sync time via NTP
 rtc.settime('ntp', host='cn.pool.ntp.org', tzone=3)  # Adjust the time zone parameter as needed
+
+def check_motion():
+    if motion_sensor.state == 1:
+        greeting_label.set_text('Bonjour Melvin')
+    else:
+        greeting_label.set_text('')
 
 def get_datetime_strings():
     dt = rtc.datetime()  # Get the current datetime tuple from the RTC
@@ -98,6 +105,9 @@ label0 = M5Label('T', x=63, y=152, color=0x000, font=FONT_MONT_22, parent=None)
 label1 = M5Label('H', x=63, y=193, color=0x000, font=FONT_MONT_22, parent=None)
 label2 = M5Label('OT', x=143, y=152, color=0x000, font=FONT_MONT_22, parent=None)
 label3 = M5Label('OH', x=143, y=193, color=0x000, font=FONT_MONT_22, parent=None)
+# Label for displaying greeting
+greeting_label = M5Label('', x=210, y=173, color=0x000, font=FONT_MONT_10, parent=None)
+
 
 passwd = "vendgelanonoarnaknonoob"
 h = hashlib.sha256(passwd.encode('utf-8'))
@@ -107,6 +117,7 @@ outdoor_weather_flag = 600  # Fetch outdoor weather every 10 minutes
 
 while True:
     date_string, time_string = get_datetime_strings()
+    check_motion()
     if outdoor_weather_flag >= 600:
         outdoor_weather = fetch_outdoor_weather()
         update_forecast_display()
