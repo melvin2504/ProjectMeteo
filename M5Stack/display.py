@@ -49,7 +49,7 @@ def fetch_outdoor_weather():
 def fetch_forecast():
     url = 'https://flaskapp3-vukguwbvha-oa.a.run.app/get_daily_forecast'
     headers = {'Content-Type': 'application/json'}
-    response = urequests.post(url, json={"passwd": passwd_hash, "city": {"lat": 48.8566, "lon": 2.3522}}, headers=headers)  # Example lat/lon for Paris
+    response = urequests.post(url, json={"passwd": passwd_hash, "city": {"lat": 46.5196535, "lon": 6.6322734}}, headers=headers) #lausanne
     if response.status_code == 200:
         forecast_data = response.json()
         return forecast_data
@@ -62,36 +62,39 @@ forecast_label = M5Label('', x=90, y=90, color=0x000, font=FONT_MONT_14, parent=
 def update_forecast_display():
     forecast_data = fetch_forecast()
     if forecast_data:
-        # Parse the first day's data
-        first_day = forecast_data[0]
         
-        # Extract date components
-        year, month, day = map(int, first_day['date'].split('-'))
-        if month < 3:
-            month += 12
-            year -= 1
-            
-        # Zeller's Congruence to calculate the day of the week
-        weekday_num = (day + (13 * (month + 1)) // 5 + year + year // 4 - year // 100 + year // 400) % 7
-        weekdays = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]  # Adjusted for Zeller's output
-        weekday_name = weekdays[weekday_num]
+        # Starting positions
+        start_x = 20
+        y = 75  # Vertical starting position for the first row
+        x_offset = 60  # Horizontal space between items
 
-        # Format temperatures as integers to remove decimals
-        min_temp = int(round(float(first_day['min_temperature'])))
-        max_temp = int(round(float(first_day['max_temperature'])))
+        for i, day_forecast in enumerate(forecast_data[:5]):
+            # Parse and calculate weekday
+            year, month, day = map(int, day_forecast['date'].split('-'))
+            if month < 3:
+                month += 12
+                year -= 1
+            weekday_num = (day + (13 * (month + 1)) // 5 + year + year // 4 - year // 100 + year // 400) % 7
+            weekdays = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]  # Shortened weekday names
+            weekday_name = weekdays[weekday_num]
 
-        # Update the label text
-        forecast_text = "{}: {}°C / {}°C, {}".format(weekday_name, min_temp, max_temp, first_day['description'])
-        forecast_label.set_text(forecast_text)
+            # Current x position for the day's data
+            current_x = start_x + i * x_offset
+
+            # Create labels for each part of the forecast
+            M5Label(weekday_name, x=current_x, y=y, color=0x000, font=FONT_MONT_10, parent=None)
+            temp_label_text = "{}°C / {}°C".format(int(round(float(day_forecast['min_temperature']))), int(round(float(day_forecast['max_temperature']))))
+            M5Label(temp_label_text, x=current_x, y=y + 20, color=0x000, font=FONT_MONT_10, parent=None)
     else:
-        forecast_label.set_text("No forecast data available")
+        M5Label("No forecast data available", x=20, y=30, color=0x000, font=FONT_MONT_10, parent=None)
+
         
 # Add an M5Img widget for the weather icon
 weather_icon = M5Img('res/01d.png', x=230, y=128, parent=None)  # Adjust position as needed
 
 # Display labels for date, time, temperature, and humidity
-date_label = M5Label('Date', x=19, y=40, color=0x000, font=FONT_MONT_18, parent=None)
-time_label = M5Label('Time', x=230, y=40, color=0x000, font=FONT_MONT_18, parent=None)
+date_label = M5Label('Date', x=19, y=20, color=0x000, font=FONT_MONT_18, parent=None)
+time_label = M5Label('Time', x=230, y=20, color=0x000, font=FONT_MONT_18, parent=None)
 temperature_icon = M5Img('res/icons8-temperature-32.png', x=19, y=135, parent=None)
 humidity_icon = M5Img('res/icons8-humidity-32.png', x=19, y=180, parent=None)
 label0 = M5Label('T', x=63, y=142, color=0x000, font=FONT_MONT_22, parent=None)
