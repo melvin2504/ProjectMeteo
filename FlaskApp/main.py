@@ -152,6 +152,23 @@ def get_outdoor_weather():
         query_job = client.query(query)  # Execute the query
         results = query_job.result()  # Wait for results
 
+
+
+        # Extract data from query results
+        row = next(iter(results), None)  # Get the first result if available
+        if row:
+            icon_code = weather_icons.get(row.outdoor_weather, '01d')  # Get icon code, use 'default' if not found
+            return jsonify({
+                "outdoor_temp": row.outdoor_temp,
+                "outdoor_humidity": row.outdoor_humidity,
+                "outdoor_weather": row.outdoor_weather,
+                "icon_code": icon_code  # Include the icon code in the response
+            })
+        else:
+            return jsonify({"error": "No data available"}), 404
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    
 @app.route('/get_daily_forecast', methods=['POST'])
 def daily_forecast():
     # Authenticate the request
@@ -207,23 +224,6 @@ def get_daily_forecast(api_key, city):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
-
-
-
- # Extract data from query results
-        row = next(iter(results), None)  # Get the first result if available
-        if row:
-            icon_code = weather_icons.get(row.outdoor_weather, '01d')  # Get icon code, use 'default' if not found
-            return jsonify({
-                "outdoor_temp": row.outdoor_temp,
-                "outdoor_humidity": row.outdoor_humidity,
-                "outdoor_weather": row.outdoor_weather,
-                "icon_code": icon_code  # Include the icon code in the response
-            })
-        else:
-            return jsonify({"error": "No data available"}), 404
-    except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
