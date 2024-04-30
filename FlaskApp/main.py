@@ -85,7 +85,7 @@ def get_outdoor_weather():
     
     # Query to select the latest outdoor temperature, humidity, and description records
     query = """
-    SELECT outdoor_temp, outdoor_humidity
+    SELECT outdoor_temp, outdoor_humidity, outdoor_weather
     FROM `lab-test-1-415115.weather_IoT_data.weather-records`
     ORDER BY date desc, time desc limit 1
     """
@@ -99,6 +99,7 @@ def get_outdoor_weather():
             return jsonify({
                 "outdoor_temp": row.outdoor_temp,
                 "outdoor_humidity": row.outdoor_humidity
+                "outdoor_weather": row.outdoor_weather
             })
         else:
             return jsonify({"error": "No data available"}), 404
