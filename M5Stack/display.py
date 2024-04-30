@@ -29,7 +29,7 @@ def get_datetime_strings():
 passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"  
 
 def fetch_outdoor_weather():
-    url = 'https://flaskapp3-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+    url = 'https://flaskapp-vukguwbvha-oa.a.run.app/get_outdoor_weather'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
     if response.status_code == 200:
@@ -40,7 +40,7 @@ def fetch_outdoor_weather():
         return None
         
 def fetch_forecast():
-    url = 'https://flaskapp3-vukguwbvha-oa.a.run.app/get_daily_forecast'
+    url = 'https://flaskapp-vukguwbvha-oa.a.run.app/get_daily_forecast'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash, "city": {"lat": 46.5196535, "lon": 6.6322734}}, headers=headers) #lausanne
     if response.status_code == 200:
@@ -58,8 +58,9 @@ def update_forecast_display():
         
         # Starting positions
         start_x = 20
-        y = 75  # Vertical starting position for the first row
+        y = 55  # Vertical starting position for the first row
         x_offset = 60  # Horizontal space between items
+        icon_size = 32  # Assuming your icons are 32x32 pixels
 
         for i, day_forecast in enumerate(forecast_data[:5]):
             # Parse and calculate weekday
@@ -78,22 +79,25 @@ def update_forecast_display():
             M5Label(weekday_name, x=current_x, y=y, color=0x000, font=FONT_MONT_10, parent=None)
             temp_label_text = "{}°C / {}°C".format(int(round(float(day_forecast['min_temperature']))), int(round(float(day_forecast['max_temperature']))))
             M5Label(temp_label_text, x=current_x, y=y + 20, color=0x000, font=FONT_MONT_10, parent=None)
+            
+            # Display the icon below the temperature
+            icon_file = 'res/{}.png'.format(day_forecast['icon'])  # Path to the icon images
+            M5Img(icon_file, x=current_x, y=y + 40, parent=None)
     else:
         M5Label("No forecast data available", x=20, y=30, color=0x000, font=FONT_MONT_10, parent=None)
 
-        
-# Add an M5Img widget for the weather icon
-weather_icon = M5Img('res/01d.png', x=230, y=128, parent=None)  # Adjust position as needed
+
+
 
 # Display labels for date, time, temperature, and humidity
 date_label = M5Label('Date', x=19, y=20, color=0x000, font=FONT_MONT_18, parent=None)
 time_label = M5Label('Time', x=230, y=20, color=0x000, font=FONT_MONT_18, parent=None)
-temperature_icon = M5Img('res/icons8-temperature-32.png', x=19, y=135, parent=None)
-humidity_icon = M5Img('res/icons8-humidity-32.png', x=19, y=180, parent=None)
-label0 = M5Label('T', x=63, y=142, color=0x000, font=FONT_MONT_22, parent=None)
-label1 = M5Label('H', x=63, y=183, color=0x000, font=FONT_MONT_22, parent=None)
-label2 = M5Label('OT', x=143, y=142, color=0x000, font=FONT_MONT_22, parent=None)
-label3 = M5Label('OH', x=143, y=183, color=0x000, font=FONT_MONT_22, parent=None)
+temperature_icon = M5Img('res/icons8-temperature-32.png', x=19, y=145, parent=None)
+humidity_icon = M5Img('res/icons8-humidity-32.png', x=19, y=190, parent=None)
+label0 = M5Label('T', x=63, y=152, color=0x000, font=FONT_MONT_22, parent=None)
+label1 = M5Label('H', x=63, y=193, color=0x000, font=FONT_MONT_22, parent=None)
+label2 = M5Label('OT', x=143, y=152, color=0x000, font=FONT_MONT_22, parent=None)
+label3 = M5Label('OH', x=143, y=193, color=0x000, font=FONT_MONT_22, parent=None)
 
 passwd = "vendgelanonoarnaknonoob"
 h = hashlib.sha256(passwd.encode('utf-8'))
@@ -108,8 +112,6 @@ while True:
         update_forecast_display()
         if outdoor_weather:
             description = outdoor_weather['outdoor_weather']
-            icon_path = 'res/' + outdoor_weather['icon_code'] + '.png'
-            weather_icon.set_img_src(icon_path)  # Update the icon on the display
             label2.set_text(str(round(outdoor_weather['outdoor_temp'])) + "°C")
             label3.set_text(str(round(outdoor_weather['outdoor_humidity'])) + "%")
         outdoor_weather_flag = 0  # Reset the counter
@@ -132,12 +134,7 @@ while True:
                 "indoor_humidity": round(env3_0.humidity)
             }
         }
-        urequests.post("https://flaskapp3-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
+        urequests.post("https://flaskapp-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
-
-
-
-
-
