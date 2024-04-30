@@ -15,13 +15,6 @@ screen.set_screen_bg_color(0xd5d5d5)
 env3_0 = unit.get(unit.ENV3, unit.PORTA)
 temp_flag = 300
 
-# Function to choose correct icon
-def get_icon(description, is_daytime=True):
-    if is_daytime:
-        return weather_icons_day.get(description, '01d.png')  # default in case description is not found
-    else:
-        return weather_icons_night.get(description, '01d.png')
-
 # Set up the RTC to sync time via NTP
 rtc.settime('ntp', host='cn.pool.ntp.org', tzone=3)  # Adjust the time zone parameter as needed
 
