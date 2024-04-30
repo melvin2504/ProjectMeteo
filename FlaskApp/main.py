@@ -202,13 +202,17 @@ def get_daily_forecast(api_key, city):
                 forecast_dict[date] = {
                     'min_temperature': entry['main']['temp_min'],
                     'max_temperature': entry['main']['temp_max'],
-                    'descriptions': [entry['weather'][0]['description']]
+                    'descriptions': [entry['weather'][0]['description']],
+                    'icon': entry['weather'][0]['icon']  # Store the icon code
                 }
             else:
+                # Update min and max temperatures
                 forecast_dict[date]['min_temperature'] = min(forecast_dict[date]['min_temperature'], entry['main']['temp_min'])
                 forecast_dict[date]['max_temperature'] = max(forecast_dict[date]['max_temperature'], entry['main']['temp_max'])
+                # Append description and update icon if it's not already included
                 if entry['weather'][0]['description'] not in forecast_dict[date]['descriptions']:
                     forecast_dict[date]['descriptions'].append(entry['weather'][0]['description'])
+                    forecast_dict[date]['icon'] = entry['weather'][0]['icon']  # Assuming the last description has the relevant icon
 
         forecast_list = []
         for date, values in forecast_dict.items():
@@ -216,7 +220,8 @@ def get_daily_forecast(api_key, city):
                 'date': date,
                 'min_temperature': values['min_temperature'],
                 'max_temperature': values['max_temperature'],
-                'description': values['descriptions'][0]  # Use the first description
+                'descriptions': values['descriptions'][-1],  
+                'icon': values['icon']  # Include the related icon code
             })
 
         forecast_list = sorted(forecast_list, key=lambda x: x['date'])[:5]
