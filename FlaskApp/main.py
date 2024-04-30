@@ -152,6 +152,62 @@ def get_outdoor_weather():
         query_job = client.query(query)  # Execute the query
         results = query_job.result()  # Wait for results
 
+@app.route('/get_daily_forecast', methods=['POST'])
+def daily_forecast():
+    # Authenticate the request
+    if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
+    
+    # Get city information from the request
+    city_info = request.get_json(force=True).get("city")
+    if not city_info or 'lat' not in city_info or 'lon' not in city_info:
+        return jsonify({"error": "City information is incomplete"}), 400
+    
+    # Fetch the forecast
+    forecast = get_daily_forecast(OPENWEATHER_API_KEY, city_info)
+    if forecast:
+        return jsonify(forecast)
+    else:
+        return jsonify({"error": "Failed to fetch forecast"}), 500
+
+def get_daily_forecast(api_key, city):
+    """Fetches the weather forecast for the next 5 days for a specified city using OpenWeatherMap's API."""
+    try:
+        url = f"http://api.openweathermap.org/data/2.5/forecast?lat={city['lat']}&lon={city['lon']}&appid={api_key}&units=metric"
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+
+        forecast_dict = {}
+        for entry in data['list']:
+            date = datetime.utcfromtimestamp(entry['dt']).strftime('%Y-%m-%d')
+            if date not in forecast_dict:
+                forecast_dict[date] = {
+                    'min_temperature': entry['main']['temp_min'],
+                    'max_temperature': entry['main']['temp_max'],
+                    'descriptions': [entry['weather'][0]['description']]
+                }
+            else:
+                forecast_dict[date]['min_temperature'] = min(forecast_dict[date]['min_temperature'], entry['main']['temp_min'])
+                forecast_dict[date]['max_temperature'] = max(forecast_dict[date]['max_temperature'], entry['main']['temp_max'])
+                if entry['weather'][0]['description'] not in forecast_dict[date]['descriptions']:
+                    forecast_dict[date]['descriptions'].append(entry['weather'][0]['description'])
+
+        forecast_list = []
+        for date, values in forecast_dict.items():
+            forecast_list.append({
+                'date': date,
+                'min_temperature': values['min_temperature'],
+                'max_temperature': values['max_temperature'],
+                'description': values['descriptions'][0]  # Use the first description
+            })
+
+        forecast_list = sorted(forecast_list, key=lambda x: x['date'])[:5]
+        return forecast_list
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
+
 
 
  # Extract data from query results
