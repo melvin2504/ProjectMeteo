@@ -17,6 +17,64 @@ app = Flask(__name__)
 
 OPENWEATHER_API_KEY = "6b85e31b08c576ddd0a8f6a60e5afc01"
 
+weather_icons = {
+    'thunderstorm with light rain': '11d',
+    'thunderstorm with rain': '11d',
+    'thunderstorm with heavy rain': '11d',
+    'light thunderstorm': '11d',
+    'thunderstorm': '11d',
+    'heavy thunderstorm': '11d',
+    'ragged thunderstorm': '11d',
+    'thunderstorm with light drizzle': '11d',
+    'thunderstorm with drizzle': '11d',
+    'thunderstorm with heavy drizzle': '11d',
+    'light intensity drizzle': '09d',
+    'drizzle': '09d',
+    'heavy intensity drizzle': '09d',
+    'light intensity drizzle rain': '09d',
+    'drizzle rain': '09d',
+    'heavy intensity drizzle rain': '09d',
+    'shower rain and drizzle': '09d',
+    'heavy shower rain and drizzle': '09d',
+    'shower drizzle': '09d',
+    'light rain': '10d',
+    'moderate rain': '10d',
+    'heavy intensity rain': '10d',
+    'very heavy rain': '10d',
+    'extreme rain': '10d',
+    'freezing rain': '13d',
+    'light intensity shower rain': '09d',
+    'shower rain': '09d',
+    'heavy intensity shower rain': '09d',
+    'ragged shower rain': '09d',
+    'light snow': '13d',
+    'snow': '13d',
+    'heavy snow': '13d',
+    'sleet': '13d',
+    'light shower sleet': '13d',
+    'shower sleet': '13d',
+    'light rain and snow': '13d',
+    'rain and snow': '13d',
+    'light shower snow': '13d',
+    'shower snow': '13d',
+    'heavy shower snow': '13d',
+    'mist': '50d',
+    'smoke': '50d',
+    'haze': '50d',
+    'sand/dust whirls': '50d',
+    'fog': '50d',
+    'sand': '50d',
+    'dust': '50d',
+    'volcanic ash': '50d',
+    'squalls': '50d',
+    'tornado': '50d',
+    'clear sky': '01d',  
+    'few clouds': '02d',  
+    'scattered clouds': '03d',  
+    'broken clouds': '04d',  
+    'overcast clouds': '04d'  
+}
+
 
 def get_weather(api_key, city):
     """Fetches the current weather for a specified city using OpenWeatherMap's API."""
@@ -94,13 +152,17 @@ def get_outdoor_weather():
         query_job = client.query(query)  # Execute the query
         results = query_job.result()  # Wait for results
 
-        # Extract data from query results
+
+
+ # Extract data from query results
         row = next(iter(results), None)  # Get the first result if available
         if row:
+            icon_code = weather_icons.get(row.outdoor_weather, '01d')  # Get icon code, use 'default' if not found
             return jsonify({
                 "outdoor_temp": row.outdoor_temp,
                 "outdoor_humidity": row.outdoor_humidity,
-                "outdoor_weather": row.outdoor_weather
+                "outdoor_weather": row.outdoor_weather,
+                "icon_code": icon_code  # Include the icon code in the response
             })
         else:
             return jsonify({"error": "No data available"}), 404
