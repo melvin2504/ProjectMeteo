@@ -19,15 +19,16 @@ OPENWEATHER_API_KEY = "6b85e31b08c576ddd0a8f6a60e5afc01"
 
 
 def get_weather(api_key, city):
+    """Fetches the current weather for a specified city using OpenWeatherMap's API."""
     try:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
         response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
+        response.raise_for_status()  # Raise an exception if the request was unsuccessful
+        data = response.json()  # Convert the response to JSON
         temperature = data['main']['temp']
         humidity = data['main']['humidity']
-        icon_code = data['weather'][0]['icon']  # Get icon code
-        return temperature, humidity, icon_code  # Return icon code
+        description = data['weather'][0]['description']
+        return temperature, humidity, description
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
@@ -109,6 +110,3 @@ def get_outdoor_weather():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
-
-
-
