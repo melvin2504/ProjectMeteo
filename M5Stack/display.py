@@ -15,64 +15,6 @@ screen.set_screen_bg_color(0xd5d5d5)
 env3_0 = unit.get(unit.ENV3, unit.PORTA)
 temp_flag = 300
 
-weather_icons = {
-    'thunderstorm with light rain': '11d',
-    'thunderstorm with rain': '11d',
-    'thunderstorm with heavy rain': '11d',
-    'light thunderstorm': '11d',
-    'thunderstorm': '11d',
-    'heavy thunderstorm': '11d',
-    'ragged thunderstorm': '11d',
-    'thunderstorm with light drizzle': '11d',
-    'thunderstorm with drizzle': '11d',
-    'thunderstorm with heavy drizzle': '11d',
-    'light intensity drizzle': '09d',
-    'drizzle': '09d',
-    'heavy intensity drizzle': '09d',
-    'light intensity drizzle rain': '09d',
-    'drizzle rain': '09d',
-    'heavy intensity drizzle rain': '09d',
-    'shower rain and drizzle': '09d',
-    'heavy shower rain and drizzle': '09d',
-    'shower drizzle': '09d',
-    'light rain': '10d',
-    'moderate rain': '10d',
-    'heavy intensity rain': '10d',
-    'very heavy rain': '10d',
-    'extreme rain': '10d',
-    'freezing rain': '13d',
-    'light intensity shower rain': '09d',
-    'shower rain': '09d',
-    'heavy intensity shower rain': '09d',
-    'ragged shower rain': '09d',
-    'light snow': '13d',
-    'snow': '13d',
-    'heavy snow': '13d',
-    'sleet': '13d',
-    'light shower sleet': '13d',
-    'shower sleet': '13d',
-    'light rain and snow': '13d',
-    'rain and snow': '13d',
-    'light shower snow': '13d',
-    'shower snow': '13d',
-    'heavy shower snow': '13d',
-    'mist': '50d',
-    'smoke': '50d',
-    'haze': '50d',
-    'sand/dust whirls': '50d',
-    'fog': '50d',
-    'sand': '50d',
-    'dust': '50d',
-    'volcanic ash': '50d',
-    'squalls': '50d',
-    'tornado': '50d',
-    'clear sky': '01d',  # Consider adding '01n' for night time
-    'few clouds': '02d',  # Consider adding '02n' for night time
-    'scattered clouds': '03d',  # Consider adding '03n' for night time
-    'broken clouds': '04d',  # Consider adding '04n' for night time
-    'overcast clouds': '04d'  # Consider adding '04n' for night time
-}
-
 # Function to choose correct icon
 def get_icon(description, is_daytime=True):
     if is_daytime:
@@ -94,7 +36,7 @@ def get_datetime_strings():
 passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"  
 
 def fetch_outdoor_weather():
-    url = 'https://flaskapp2-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+    url = 'https://flaskapp-vukguwbvha-oa.a.run.app/get_outdoor_weather'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
     if response.status_code == 200:
@@ -129,8 +71,7 @@ while True:
         outdoor_weather = fetch_outdoor_weather()
         if outdoor_weather:
             description = outdoor_weather['outdoor_weather']
-            icon_filename = weather_icons.get(description, '01d.png')  # Use a default icon if no match found
-            icon_path = 'res/' + icon_filename + '.png'
+            icon_path = 'res/' + outdoor_weather['icon_code'] + '.png'
             weather_icon.set_img_src(icon_path)  # Update the icon on the display
             label2.set_text(str(round(outdoor_weather['outdoor_temp'])) + "°C")
             label3.set_text(str(round(outdoor_weather['outdoor_humidity'])) + "%")
@@ -154,7 +95,12 @@ while True:
                 "indoor_humidity": round(env3_0.humidity)
             }
         }
-        urequests.post("https://flaskapp2-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
+        urequests.post("https://flaskapp-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
+
+
+
+
+
