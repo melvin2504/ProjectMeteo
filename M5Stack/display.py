@@ -69,39 +69,51 @@ def fetch_forecast():
         
 forecast_label = M5Label('', x=90, y=90, color=0x000, font=FONT_MONT_14, parent=None)  # Adjust x, y for centering
 
+# Initialize a list to keep track of forecast UI elements
+forecast_ui_elements = []
+
+def clear_forecast_display():
+    global forecast_ui_elements
+    # Iterate through the list of UI elements and remove each from the screen
+    for element in forecast_ui_elements:
+        element.delete()
+    # Clear the list once all elements are removed
+    forecast_ui_elements.clear()
+
 def update_forecast_display():
+    global forecast_ui_elements
+    # Clear existing forecast display before updating
+    clear_forecast_display()
+    
     forecast_data = fetch_forecast()
     if forecast_data:
-        
-        # Starting positions
         start_x = 20
-        y = 55  # Vertical starting position for the first row
-        x_offset = 60  # Horizontal space between items
-        icon_size = 32  # Assuming your icons are 32x32 pixels
+        y = 55
+        x_offset = 60
 
         for i, day_forecast in enumerate(forecast_data[:5]):
-            # Parse and calculate weekday
             year, month, day = map(int, day_forecast['date'].split('-'))
             if month < 3:
                 month += 12
                 year -= 1
             weekday_num = (day + (13 * (month + 1)) // 5 + year + year // 4 - year // 100 + year // 400) % 7
-            weekdays = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]  # Shortened weekday names
+            weekdays = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
             weekday_name = weekdays[weekday_num]
 
-            # Current x position for the day's data
             current_x = start_x + i * x_offset
 
-            # Create labels for each part of the forecast
-            M5Label(weekday_name, x=current_x, y=y, color=0x000, font=FONT_MONT_10, parent=None)
+            # Create and store labels for the forecast
+            day_label = M5Label(weekday_name, x=current_x, y=y, color=0x000, font=FONT_MONT_10, parent=None)
             temp_label_text = "{}°C / {}°C".format(int(round(float(day_forecast['min_temperature']))), int(round(float(day_forecast['max_temperature']))))
-            M5Label(temp_label_text, x=current_x, y=y + 20, color=0x000, font=FONT_MONT_10, parent=None)
-            
-            # Display the icon below the temperature
-            icon_file = 'res/{}.png'.format(day_forecast['icon'])  # Path to the icon images
-            M5Img(icon_file, x=current_x, y=y + 40, parent=None)
+            temp_label = M5Label(temp_label_text, x=current_x, y=y + 20, color=0x000, font=FONT_MONT_10, parent=None)
+            icon_file = 'res/{}.png'.format(day_forecast['icon'])
+            icon = M5Img(icon_file, x=current_x, y=y + 40, parent=None)
+
+            # Add the created elements to the list
+            forecast_ui_elements.extend([day_label, temp_label, icon])
     else:
-        M5Label("No forecast data available", x=20, y=30, color=0x000, font=FONT_MONT_10, parent=None)
+        no_data_label = M5Label("No forecast data available", x=20, y=30, color=0x000, font=FONT_MONT_10, parent=None)
+        forecast_ui_elements.append(no_data_label)
 
 
 
@@ -167,3 +179,5 @@ while True:
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
+
+
