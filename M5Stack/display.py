@@ -158,12 +158,12 @@ while True:
                 "date": date_string,
                 "time": time_string,
                 "indoor_temp": round(env3_0.temperature),
-                "indoor_humidity": round(env3_0.humidity)
+                "indoor_humidity": round(env3_0.humidity),
+                "indoor_tvoc": tvoc0.TVOC,
+                "indoor_eco2": tvoc0.eCO2
             }
         }
         urequests.post("https://flaskapp-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
-
-
