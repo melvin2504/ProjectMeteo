@@ -17,7 +17,7 @@ motion_sensor = unit.get(unit.PIR, unit.PORTB)
 temp_flag = 300
 
 # Set up the RTC to sync time via NTP
-rtc.settime('ntp', host='cn.pool.ntp.org', tzone=3)  # Adjust the time zone parameter as needed
+rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
 
 def check_motion():
     if motion_sensor.state == 1:
@@ -99,12 +99,14 @@ def update_forecast_display():
 # Display labels for date, time, temperature, and humidity
 date_label = M5Label('Date', x=19, y=20, color=0x000, font=FONT_MONT_18, parent=None)
 time_label = M5Label('Time', x=230, y=20, color=0x000, font=FONT_MONT_18, parent=None)
-temperature_icon = M5Img('res/icons8-temperature-32.png', x=19, y=145, parent=None)
-humidity_icon = M5Img('res/icons8-humidity-32.png', x=19, y=190, parent=None)
-label0 = M5Label('T', x=63, y=152, color=0x000, font=FONT_MONT_22, parent=None)
-label1 = M5Label('H', x=63, y=193, color=0x000, font=FONT_MONT_22, parent=None)
-label2 = M5Label('OT', x=143, y=152, color=0x000, font=FONT_MONT_22, parent=None)
-label3 = M5Label('OH', x=143, y=193, color=0x000, font=FONT_MONT_22, parent=None)
+temperature_icon = M5Img('res/icons8-temperature-32.png', x=19, y=155, parent=None)
+humidity_icon = M5Img('res/icons8-humidity-32.png', x=19, y=200, parent=None)
+inlabel = M5Label('In', x=76, y=147, color=0x000, font=FONT_MONT_10, parent=None)
+outlabel = M5Label('Out', x=151, y=147, color=0x000, font=FONT_MONT_10, parent=None)
+label0 = M5Label('T', x=63, y=162, color=0x000, font=FONT_MONT_22, parent=None)
+label1 = M5Label('H', x=63, y=203, color=0x000, font=FONT_MONT_22, parent=None)
+label2 = M5Label('OT', x=143, y=162, color=0x000, font=FONT_MONT_22, parent=None)
+label3 = M5Label('OH', x=143, y=203, color=0x000, font=FONT_MONT_22, parent=None)
 # Label for displaying greeting
 greeting_label = M5Label('', x=210, y=173, color=0x000, font=FONT_MONT_10, parent=None)
 
@@ -149,3 +151,8 @@ while True:
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
+
+
+
+
+
