@@ -14,16 +14,26 @@ screen.clean_screen()
 screen.set_screen_bg_color(0xd5d5d5)
 env3_0 = unit.get(unit.ENV3, unit.PORTA)
 motion_sensor = unit.get(unit.PIR, unit.PORTB)
+tvoc0 = unit.get(unit.TVOC, unit.PORTC)
 temp_flag = 300
+
+
 
 # Set up the RTC to sync time via NTP
 rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
 
-def check_motion():
+'''def check_motion():
     if motion_sensor.state == 1:
         greeting_label.set_text('Bonjour Melvin')
     else:
-        greeting_label.set_text('')
+        greeting_label.set_text('')'''
+        
+def update_air_quality():
+    tvoc = tvoc0.TVOC
+    eco2 = tvoc0.eCO2
+    tvoc_label.set_text('TVOC: {} ppb'.format(tvoc))
+    eco2_label.set_text('eCO2: {} ppm'.format(eco2))
+
 
 def get_datetime_strings():
     dt = rtc.datetime()  # Get the current datetime tuple from the RTC
@@ -107,8 +117,12 @@ label0 = M5Label('T', x=63, y=162, color=0x000, font=FONT_MONT_22, parent=None)
 label1 = M5Label('H', x=63, y=203, color=0x000, font=FONT_MONT_22, parent=None)
 label2 = M5Label('OT', x=143, y=162, color=0x000, font=FONT_MONT_22, parent=None)
 label3 = M5Label('OH', x=143, y=203, color=0x000, font=FONT_MONT_22, parent=None)
+# Display labels for air quality data
+air_quality_label = M5Label('Air Quality', x=230, y=170, color=0x000, font=FONT_MONT_14, parent=None)
+tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=195, color=0x000, font=FONT_MONT_10, parent=None)
+eco2_label = M5Label('eCO2: 0 ppm', x=230, y=215, color=0x000, font=FONT_MONT_10, parent=None)
 # Label for displaying greeting
-greeting_label = M5Label('', x=210, y=173, color=0x000, font=FONT_MONT_10, parent=None)
+#greeting_label = M5Label('', x=210, y=173, color=0x000, font=FONT_MONT_10, parent=None)
 
 
 passwd = "vendgelanonoarnaknonoob"
@@ -119,7 +133,7 @@ outdoor_weather_flag = 600  # Fetch outdoor weather every 10 minutes
 
 while True:
     date_string, time_string = get_datetime_strings()
-    check_motion()
+    update_air_quality()
     if outdoor_weather_flag >= 600:
         outdoor_weather = fetch_outdoor_weather()
         update_forecast_display()
@@ -151,8 +165,5 @@ while True:
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
-
-
-
 
 
