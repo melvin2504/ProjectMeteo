@@ -17,16 +17,19 @@ motion_sensor = unit.get(unit.PIR, unit.PORTB)
 tvoc0 = unit.get(unit.TVOC, unit.PORTC)
 temp_flag = 300
 
-
+# Initialize the last motion time variable
+last_motion_time = 0
+motion_cooldown = 300  # 5 minutes in seconds
 
 # Set up the RTC to sync time via NTP
 rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
 
 def check_motion():
-    if motion_sensor.state == 1:
-        greeting_label.set_text('Bonjour Melvin')
-    else:
-        greeting_label.set_text('')
+    global last_motion_time
+    current_time = time.time()
+    if motion_sensor.state == 1 and (current_time - last_motion_time > motion_cooldown):
+        speaker.playWAV('res/hello.wav', volume=6)
+        last_motion_time = current_time  # Update the last motion time
         
 def update_air_quality():
     tvoc = tvoc0.TVOC
