@@ -22,11 +22,11 @@ temp_flag = 300
 # Set up the RTC to sync time via NTP
 rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
 
-'''def check_motion():
+def check_motion():
     if motion_sensor.state == 1:
         greeting_label.set_text('Bonjour Melvin')
     else:
-        greeting_label.set_text('')'''
+        greeting_label.set_text('')
         
 def update_air_quality():
     tvoc = tvoc0.TVOC
@@ -130,11 +130,11 @@ label1 = M5Label('H', x=63, y=203, color=0x000, font=FONT_MONT_22, parent=None)
 label2 = M5Label('OT', x=143, y=162, color=0x000, font=FONT_MONT_22, parent=None)
 label3 = M5Label('OH', x=143, y=203, color=0x000, font=FONT_MONT_22, parent=None)
 # Display labels for air quality data
-air_quality_label = M5Label('Air Quality', x=230, y=170, color=0x000, font=FONT_MONT_14, parent=None)
-tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=195, color=0x000, font=FONT_MONT_10, parent=None)
-eco2_label = M5Label('eCO2: 0 ppm', x=230, y=215, color=0x000, font=FONT_MONT_10, parent=None)
+air_quality_icon = M5Img('res/icons8-air-16.png', x=200, y=168, parent=None)
+tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=166, color=0x000, font=FONT_MONT_10, parent=None)
+eco2_label = M5Label('eCO2: 0 ppm', x=230, y=186, color=0x000, font=FONT_MONT_10, parent=None)
 # Label for displaying greeting
-#greeting_label = M5Label('', x=210, y=173, color=0x000, font=FONT_MONT_10, parent=None)
+greeting_label = M5Label('', x=230, y=213, color=0x000, font=FONT_MONT_10, parent=None)
 
 
 passwd = "vendgelanonoarnaknonoob"
@@ -146,6 +146,7 @@ outdoor_weather_flag = 600  # Fetch outdoor weather every 10 minutes
 while True:
     date_string, time_string = get_datetime_strings()
     update_air_quality()
+    check_motion()
     if outdoor_weather_flag >= 600:
         outdoor_weather = fetch_outdoor_weather()
         update_forecast_display()
@@ -179,5 +180,4 @@ while True:
         temp_flag = 0
     temp_flag += 1
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
-
 
