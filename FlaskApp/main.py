@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify
 import os
 from google.cloud import bigquery
+from google.cloud import texttospeech
 import requests
 from datetime import datetime
 
 # You only need to uncomment the line below if you want to run your flask app locally.
 #os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = ""
 client = bigquery.Client(project="lab-test-1-415115")
-
+# Google Text-to-Speech client initialization
+tts_client = texttospeech.TextToSpeechClient()
 
 # For authentication
 
@@ -98,6 +100,42 @@ SELECT * FROM `lab-test-1-415115.weather_IoT_data.weather-records` LIMIT 10
 """
 query_job = client.query(q)
 df = query_job.to_dataframe()
+
+
+@app.route('/generate_advice_audio', methods=['POST'])
+def generate_advice_audio():
+    weather_data = request.get_json(force=True)
+    temperature = weather_data.get('temperature')
+    description = weather_data.get('description').lower()
+
+    # Generate the base message with current weather description and temperature
+    message = f"Today, the weather is {description} with a temperature of {temperature}°C. "
+    
+    # Append advice based on the weather description
+    if 'rain' in description:
+        message += "Don't forget to take an umbrella today."
+    elif any(x in description for x in ['clear', 'sun']):
+        message += "It's a nice day for a walk. Don't forget your sunscreen."
+    elif 'snow' in description:
+        message += "Wrap up warm, it's snowing outside."
+    elif any(x in description for x in ['cloud', 'overcast']):
+        message += "It's quite cloudy today."
+    elif 'thunderstorm' in description:
+        message += "Stay indoors if possible, there is a thunderstorm."
+
+    # Setup the synthesis input with the generated message
+    synthesis_input = texttospeech.SynthesisInput(text=message)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code='en-US', ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL)
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.LINEAR16)
+
+    # Perform the text-to-speech request
+    response = tts_client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
+
+    # Return the audio content as a WAV file in the HTTP response
+    return Response(response.audio_content, mimetype='audio/wav')
+
 
 @app.route('/send-to-bigquery', methods=['POST'])
 def send_to_bigquery():
