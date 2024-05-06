@@ -17,9 +17,11 @@ motion_sensor = unit.get(unit.PIR, unit.PORTB)
 tvoc0 = unit.get(unit.TVOC, unit.PORTC)
 temp_flag = 300
 
+passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab" 
+
 # Initialize the last motion time variable
 last_motion_time = 0
-motion_cooldown = 300  # 5 minutes in seconds
+motion_cooldown = 300  # 1 minutes in seconds
 
 # Set up the RTC to sync time via NTP
 rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
@@ -28,7 +30,7 @@ def check_motion():
     global last_motion_time
     current_time = time.time()
     if motion_sensor.state == 1 and (current_time - last_motion_time > motion_cooldown):
-        speaker.playWAV('res/hello.wav', volume=6)
+        fetch_and_play_advice()
         last_motion_time = current_time  # Update the last motion time
         
 def update_air_quality():
@@ -45,11 +47,9 @@ def get_datetime_strings():
     # Format the time string (Hour:Minute:Second)
     time_string = "{:02}:{:02}:{:02}".format(dt[4], dt[5], dt[6])
     return date_string, time_string
-    
-passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"  
 
 def fetch_outdoor_weather():
-    url = 'https://flaskapp-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+    url = 'https://flaskapp2-vukguwbvha-oa.a.run.app/get_outdoor_weather'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
     if response.status_code == 200:
@@ -59,8 +59,20 @@ def fetch_outdoor_weather():
         print("Failed to fetch weather data: ", response.status_code)
         return None
         
+def fetch_and_play_advice():
+    outdoor_weather = fetch_outdoor_weather()
+    url = 'https://flaskapp2-vukguwbvha-oa.a.run.app/generate_advice_audio'
+    headers = {'Content-Type': 'application/json'}
+    response = urequests.post(url, json=outdoor_weather, headers=headers)
+    if response.status_code == 200:
+        with open('res/advice.wav', 'wb') as f:
+            f.write(response.content)
+        speaker.playWAV('res/advice.wav', volume=20)
+    else:
+        print("Failed to fetch advice audio: ", response.status_code)
+        
 def fetch_forecast():
-    url = 'https://flaskapp-vukguwbvha-oa.a.run.app/get_daily_forecast'
+    url = 'https://flaskapp2-vukguwbvha-oa.a.run.app/get_daily_forecast'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash, "city": {"lat": 46.5196535, "lon": 6.6322734}}, headers=headers) #lausanne
     if response.status_code == 200:
@@ -149,7 +161,6 @@ outdoor_weather_flag = 600  # Fetch outdoor weather every 10 minutes
 while True:
     date_string, time_string = get_datetime_strings()
     update_air_quality()
-    check_motion()
     if outdoor_weather_flag >= 600:
         outdoor_weather = fetch_outdoor_weather()
         update_forecast_display()
@@ -179,8 +190,13 @@ while True:
                 "indoor_eco2": tvoc0.eCO2
             }
         }
-        urequests.post("https://flaskapp-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
+        urequests.post("https://flaskapp2-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
         temp_flag = 0
     temp_flag += 1
+    check_motion()
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
+
+
+
+
 
