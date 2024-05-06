@@ -105,7 +105,7 @@ df = query_job.to_dataframe()
 @app.route('/generate_advice_audio', methods=['POST'])
 def generate_advice_audio():
     weather_data = request.get_json(force=True)
-    temperature = weather_data.get(''outdoor_temp')
+    temperature = weather_data.get('outdoor_temp')
     description = weather_data.get('outdoor_weather').lower()
 
     # Generate the base message with current weather description and temperature
