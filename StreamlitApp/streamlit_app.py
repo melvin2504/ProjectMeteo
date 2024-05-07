@@ -5,18 +5,24 @@ import matplotlib.pyplot as plt
 from streamlit_echarts import st_echarts
 from datetime import datetime
 import random
+import requests
 
 
+def fetch_latest_temperature():
+    url = 'http://127.0.0.1:8080/get-latest-temperature'  # Endpoint URL
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()['temperature']  # Assumes the response is {'temperature': value}
+        else:
+            return None
+    except requests.exceptions.RequestException as e:
+        st.error('Failed to fetch latest temperature: {}'.format(e))
+        return None
 
-# def live_clock():
-#     time_display = st.empty()  
-#     while True:
-#         now = datetime.now()
-#         current_time = now.strftime("%H:%M:%S") 
-#         time_display.markdown(f"**Current Time: {current_time}**")  
-#         time.sleep(1) 
 def temp_gauge():
-
+    latest_temp = fetch_latest_temperature()
+    st.write(f"Latest temperature: {latest_temp} °C")
     options = {
         "series": [
             {
@@ -128,9 +134,9 @@ def temp_gauge():
     }
 
 
-    random_val = round(random.random() * 60, 2)
-    options["series"][0]["data"][0]["value"] = random_val
-    options["series"][1]["data"][0]["value"] = random_val
+    
+    options["series"][0]["data"][0]["value"] = latest_temp
+    options["series"][1]["data"][0]["value"] = latest_temp
     st_echarts(options=options, height="500px")
 
 

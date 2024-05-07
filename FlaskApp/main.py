@@ -101,7 +101,33 @@ SELECT * FROM `lab-test-1-415115.weather_IoT_data.weather-records` LIMIT 10
 query_job = client.query(q)
 df = query_job.to_dataframe()
 
+@app.route('/')
+def index():
+    return "Welcome to the Weather App!"
 
+@app.route('/get-latest-temperature', methods=['GET'])
+def get_latest_temperature():
+
+    query = """
+    SELECT outdoor_temp
+    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
+    ORDER BY time DESC
+    LIMIT 1
+    """
+    try:
+        # Execute the query
+        query_job = client.query(query)
+        results = query_job.result()  # Waits for the job to complete.
+
+        # Fetch the temperature
+        for row in results:
+            temperature = row.outdoor_temp
+            return jsonify({"temperature": temperature})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
 @app.route('/generate_advice_audio', methods=['POST'])
 def generate_advice_audio():
     weather_data = request.get_json(force=True)
