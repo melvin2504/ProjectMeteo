@@ -1,4 +1,5 @@
 import time
+import os
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,7 +7,11 @@ from streamlit_echarts import st_echarts
 from datetime import datetime
 import random
 import requests
+from PIL import Image
 
+YOUR_HASH_PASSWD = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ICON_DIR = os.path.join(BASE_DIR, 'Icons')  # Path to the Icons folder
 
 def fetch_latest_temperature():
     url = 'http://127.0.0.1:8080/get-latest-temperature'  # Endpoint URL
@@ -20,6 +25,25 @@ def fetch_latest_temperature():
         st.error('Failed to fetch latest temperature: {}'.format(e))
         return None
 
+def fetch_daily_forecast(city_lat, city_lon, password):
+    url = 'http://127.0.0.1:8080/get_daily_forecast'  # Adjust the URL if Flask is running on a different host or port
+    headers = {'Content-Type': 'application/json'}
+    data = {
+        "passwd": password,
+        "city": {
+            "lat": city_lat,
+            "lon": city_lon
+        }
+    }
+
+    response = requests.post(url, json=data, headers=headers)
+    if response.status_code == 200:
+        forecast = response.json()
+        return forecast
+    else:
+        st.error(f"Failed to retrieve forecast: {response.json().get('error', 'Unknown error')}")
+        return None
+    
 def temp_gauge():
     latest_temp = fetch_latest_temperature()
     st.write(f"Latest temperature: {latest_temp} °C")
@@ -139,7 +163,6 @@ def temp_gauge():
     options["series"][1]["data"][0]["value"] = latest_temp
     st_echarts(options=options, height="500px")
 
-
 def render_basic_bar():
     option = {
         "backgroundColor": 'transparent',
@@ -231,12 +254,34 @@ def render_heatmap():
     # Display the chart
     st_echarts(options=options, height="500px")
 
+def display_forecast(forecast_data):
+    # Using columns in Streamlit to display each piece of data
+    cols = st.columns(len(forecast_data))
+    days = [datetime.strptime(day['date'], "%Y-%m-%d").strftime('%a') for day in forecast_data]
+    temps = [f"{round(day['min_temperature'])}°C / {round(day['max_temperature'])}°C" for day in forecast_data]
+    icons = [os.path.join(ICON_DIR, f"{day['icon']}.png") for day in forecast_data]
+
+    for col, day, temp, icon_path in zip(cols, days, temps, icons):
+        with col:
+            st.write(day)
+            image = Image.open(icon_path)
+            st.image(image)  # Adjust the width as necessary
+            st.write(temp)
+
 if __name__ == "__main__":
-    st.title('Weather Dashboard')
+    st.markdown(f"""
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="margin: 0;">Weather Dashboard</h1>
+            <h2 style="margin: 0;">{datetime.now().strftime("%d-%B-%Y")}</h2>
+        </div>
+        """, unsafe_allow_html=True)
+    city_lat = 46.5197
+    city_lon = 6.6323
+    forecast = fetch_daily_forecast(city_lat, city_lon, YOUR_HASH_PASSWD)
+    display_forecast(forecast)
     render_basic_bar()
     temp_gauge()
     render_heatmap()    
     #live_clock()
-    
 
 
