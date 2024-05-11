@@ -4,9 +4,16 @@ from google.cloud import bigquery
 from google.cloud import texttospeech
 import requests
 from datetime import datetime
+from openai import OpenAI
 
 # You only need to uncomment the line below if you want to run your flask app locally.
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./lab-test-1-415115-c2f0b755d8b4.json"
+
+# Initialize the OpenAI client
+clientAI = OpenAI(
+    api_key="sk-proj-ewEynB9LGERMFCdacv2lT3BlbkFJj8xC95U78WlMP1ZZ9Aiu",
+)
+
 client = bigquery.Client(project="lab-test-1-415115")
 # Google Text-to-Speech client initialization
 tts_client = texttospeech.TextToSpeechClient()
@@ -127,7 +134,29 @@ def get_latest_temperature():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-    
+def generate_weather_advice(outdoor_temp, outdoor_weather):
+    """
+    Generate weather advice using GPT-3.5 based on the provided temperature and weather conditions.
+    """
+    prompt = (
+        f"Today, the weather is {outdoor_weather} with a temperature of {outdoor_temp}°C. "
+        "Tell how much degrees it is and the outside weather. Give some advice before going outside."
+    )
+
+    chat_completion = clientAI.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        model="gpt-3.5-turbo",
+        max_tokens=100,
+        temperature=0.7
+    )
+
+    advice = chat_completion.choices[0].message.content.strip()
+    return advice
+
+
 @app.route('/generate_advice_audio', methods=['POST'])
 def generate_advice_audio():
     weather_data = request.get_json(force=True)
@@ -135,19 +164,7 @@ def generate_advice_audio():
     description = weather_data.get('outdoor_weather').lower()
 
     # Generate the base message with current weather description and temperature
-    message = f"Today, the weather is {description} with a temperature of {temperature}°C. "
-    
-    # Append advice based on the weather description
-    if 'rain' in description:
-        message += "Don't forget to take an umbrella today."
-    elif any(x in description for x in ['clear', 'sun']):
-        message += "It's a nice day for a walk. Don't forget your sunscreen."
-    elif 'snow' in description:
-        message += "Wrap up warm, it's snowing outside."
-    elif any(x in description for x in ['cloud', 'overcast']):
-        message += "It's quite cloudy today."
-    elif 'thunderstorm' in description:
-        message += "Stay indoors if possible, there is a thunderstorm."
+    message = generate_weather_advice(temperature, description)
 
     # Setup the synthesis input with the generated message
     synthesis_input = texttospeech.SynthesisInput(text=message)
