@@ -49,7 +49,7 @@ def get_datetime_strings():
     return date_string, time_string
 
 def fetch_outdoor_weather():
-    url = 'https://flaskapp2-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+    url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/get_outdoor_weather'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
     if response.status_code == 200:
@@ -61,7 +61,7 @@ def fetch_outdoor_weather():
         
 def fetch_and_play_advice():
     outdoor_weather = fetch_outdoor_weather()
-    url = 'https://flaskapp2-vukguwbvha-oa.a.run.app/generate_advice_audio'
+    url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/generate_advice_audio'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json=outdoor_weather, headers=headers)
     if response.status_code == 200:
@@ -72,7 +72,7 @@ def fetch_and_play_advice():
         print("Failed to fetch advice audio: ", response.status_code)
         
 def fetch_forecast():
-    url = 'https://flaskapp2-vukguwbvha-oa.a.run.app/get_daily_forecast'
+    url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/get_daily_forecast'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash, "city": {"lat": 46.5196535, "lon": 6.6322734}}, headers=headers) #lausanne
     if response.status_code == 200:
@@ -190,13 +190,8 @@ while True:
                 "indoor_eco2": tvoc0.eCO2
             }
         }
-        urequests.post("https://flaskapp2-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
+        urequests.post("https://flaskapp4-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
         temp_flag = 0
     temp_flag += 1
     check_motion()
     wait_ms(1000)  # wait for one second, then increase the wait time calculation
-
-
-
-
-
