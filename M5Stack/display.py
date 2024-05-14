@@ -23,6 +23,13 @@ passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
 last_motion_time = 0
 motion_cooldown = 300  # 1 minutes in seconds
 
+# Define thresholds for alerts
+LOW_HUMIDITY_THRESHOLD = 30  # Example threshold for low humidity (30%)
+HIGH_HUMIDITY_THRESHOLD = 70  # Example threshold for high humidity (70%)
+POOR_AIR_QUALITY_THRESHOLD = 1000  # Example threshold for poor air quality (1000 ppb TVOC)
+ELEVATED_ECO2_THRESHOLD = 1000  # Example threshold for elevated eCO2 (1000 ppm)
+
+
 # Set up the RTC to sync time via NTP
 rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
 
@@ -38,7 +45,22 @@ def update_air_quality():
     eco2 = tvoc0.eCO2
     tvoc_label.set_text('TVOC: {} ppb'.format(tvoc))
     eco2_label.set_text('eCO2: {} ppm'.format(eco2))
+    
+    # Check for low/high humidity, poor air quality, or elevated eCO2
+    if env3_0.humidity < LOW_HUMIDITY_THRESHOLD:
+        play_alert("ALERT: Low humidity")
+    elif env3_0.humidity > HIGH_HUMIDITY_THRESHOLD:
+        play_alert("ALERT: High humidity")
+    elif tvoc > POOR_AIR_QUALITY_THRESHOLD:
+        play_alert("ALERT: Poor air quality")
+    elif eco2 > ELEVATED_ECO2_THRESHOLD:
+        play_alert("ALERT: Elevated eCO2")
+    else:
+      alert_message.set_text("")
 
+def play_alert(message):
+    speaker.playWAV('res/ding.wav', volume=20)
+    alert_message.set_text(message)
 
 def get_datetime_strings():
     dt = rtc.datetime()  # Get the current datetime tuple from the RTC
@@ -148,9 +170,9 @@ label3 = M5Label('OH', x=143, y=203, color=0x000, font=FONT_MONT_22, parent=None
 air_quality_icon = M5Img('res/icons8-air-16.png', x=200, y=168, parent=None)
 tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=166, color=0x000, font=FONT_MONT_10, parent=None)
 eco2_label = M5Label('eCO2: 0 ppm', x=230, y=186, color=0x000, font=FONT_MONT_10, parent=None)
-# Label for displaying greeting
-greeting_label = M5Label('', x=230, y=213, color=0x000, font=FONT_MONT_10, parent=None)
 
+# Label for displaying alert messages
+alert_message = M5Label('', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
 
 passwd = "vendgelanonoarnaknonoob"
 h = hashlib.sha256(passwd.encode('utf-8'))
