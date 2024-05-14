@@ -3,8 +3,7 @@ from google.cloud import bigquery, texttospeech
 from weather import get_weather, get_daily_forecast, weather_icons
 from openai_utils import generate_weather_advice
 from google_cloud_utils import insert_data_to_bigquery, query_latest_weather
-import hashlib
-import binascii
+from config import OPENWEATHER_API_KEY, YOUR_HASH_PASSWD, GCP_PROJECT_ID
 import os
 
 # Uncomment the line below if you want to run your flask app locally.
@@ -12,11 +11,7 @@ import os
 
 app = Flask(__name__)
 
-# Constants and Config
-YOUR_HASH_PASSWD = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
-OPENWEATHER_API_KEY = "6b85e31b08c576ddd0a8f6a60e5afc01"
-
-client = bigquery.Client(project="lab-test-1-415115")
+client = bigquery.Client(project=GCP_PROJECT_ID)
 tts_client = texttospeech.TextToSpeechClient()
 
 @app.route('/')
@@ -26,7 +21,8 @@ def index():
 @app.route('/get-latest-temperature', methods=['GET'])
 def get_latest_temperature():
     try:
-        temperature = query_latest_weather(client)
+        weather_data = query_latest_weather(client)
+        temperature = weather_data['outdoor_temp']
         return jsonify({"temperature": temperature})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
