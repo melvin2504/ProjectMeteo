@@ -100,14 +100,6 @@ def get_weather(api_key, city):
         print(f"An error occurred: {e}")
         return None
 
-# get the column names of the db
-# PROJECT_ID.DATASET_ID.weather-records
-q = """
-SELECT * FROM `lab-test-1-415115.weather_IoT_data.weather-records` LIMIT 10
-"""
-query_job = client.query(q)
-df = query_job.to_dataframe()
-
 @app.route('/')
 def index():
     return "Welcome to the Weather App!"
