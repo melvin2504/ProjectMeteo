@@ -18,15 +18,6 @@ tts_client = texttospeech.TextToSpeechClient()
 def index():
     return "Welcome to the Weather App!"
 
-@app.route('/get-latest-temperature', methods=['GET'])
-def get_latest_temperature():
-    try:
-        weather_data = query_latest_weather(client)
-        temperature = weather_data['outdoor_temp']
-        return jsonify({"temperature": temperature})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 @app.route('/generate_advice_audio', methods=['POST'])
 def generate_advice_audio():
     weather_data = request.get_json(force=True)
