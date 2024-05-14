@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+from config import OPENWEATHER_API_KEY
 
 weather_icons = {
     'thunderstorm with light rain': '11d',
