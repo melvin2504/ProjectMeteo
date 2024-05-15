@@ -8,6 +8,8 @@ import hashlib
 import binascii
 import ntptime
 import machine
+import wifiCfg
+
 
 # Initialize the screen and units
 screen = M5Screen()
@@ -16,6 +18,18 @@ screen.set_screen_bg_color(0xd5d5d5)
 env3_0 = unit.get(unit.ENV3, unit.PORTA)
 motion_sensor = unit.get(unit.PIR, unit.PORTB)
 tvoc0 = unit.get(unit.TVOC, unit.PORTC)
+
+# Wi-Fi credentials
+SSID = "Galaxy S20 FE 5GDEE0"
+PASSWORD = "........"
+
+# Connect to Wi-Fi
+wifiCfg.doConnect(SSID, PASSWORD)
+while not wifiCfg.wlan_sta.isconnected():
+    wait_ms(500)
+    print("Connecting to Wi-Fi...")
+
+print("Connected to Wi-Fi")
 
 # Initialize variables and constants
 temp_flag = 300
@@ -39,7 +53,7 @@ rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone para
 def check_motion():
     global last_motion_time
     current_time = time.time()
-    if motion_sensor.state == 1 and (current_time - last_motion_time > motion_cooldown):
+    if (motion_sensor.state == 1 and (current_time - last_motion_time > motion_cooldown)) or btnA.isPressed():
         fetch_and_play_advice()
         last_motion_time = current_time  # Update the last motion time
 
@@ -228,3 +242,6 @@ while True:
 
     # Wait for one second before the next iteration
     wait_ms(1000)
+
+
+
