@@ -15,14 +15,11 @@ motion_sensor = unit.get(unit.PIR, unit.PORTB)
 tvoc0 = unit.get(unit.TVOC, unit.PORTC)
 
 # Wi-Fi credentials (default)
-SSID1 = "iot-unil"
-PASSWORD1 = "4u6uch4hpY9pJ2f9"
-SSID2 = "Galaxy S20 FE 5GDEE0"
-PASSWORD2 = "........"
+SSID2 = "iot-unil"
+PASSWORD2 = "4u6uch4hpY9pJ2f9"
+SSID1 = "Galaxy S20 FE 5GDEE0"
+PASSWORD1 = "........"
 
-# Global variable to hold the selected SSID and password
-ssid = SSID1
-password = PASSWORD1
 
 # Constants for Wi-Fi connection attempts
 MAX_RETRIES = 10
@@ -204,12 +201,13 @@ def init_main_screen():
     tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=166, color=0x000, font=FONT_MONT_10, parent=None)
     eco2_label = M5Label('eCO2: 0 ppm', x=230, y=186, color=0x000, font=FONT_MONT_10, parent=None)
     
-    alert_message = M5Label('hello', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+    alert_message = M5Label(' Hello !', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
     
     # Set up the RTC to sync time via NTP
     rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
     
     update_forecast_display()
+
 
 def connect_wifi():
     """Connects to WiFi with retry logic."""
@@ -218,15 +216,26 @@ def connect_wifi():
     attempts = 0
 
     # Create a label for connection status
-    connection_label = M5Label('', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+    connection_label = M5Label('', x=150, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
 
+    # Try connecting to the first network
     while not wlan.isconnected() and attempts < MAX_RETRIES:
-        connection_label.set_text('Connecting... Attempt {}'.format(attempts + 1))
-        wlan.connect(ssid, password)
+        connection_label.set_text('Connecting to {}... Attempt {}'.format(SSID1, attempts + 1))
+        wlan.connect(SSID1, PASSWORD1)
         time.sleep(DELAY)
         attempts += 1
 
+    # If not connected, try connecting to the second network
+    if not wlan.isconnected():
+        attempts = 0  # Reset attempts for the second network
+        while not wlan.isconnected() and attempts < MAX_RETRIES:
+            connection_label.set_text('Connecting to {}... Attempt {}'.format(SSID2, attempts + 1))
+            wlan.connect(SSID2, PASSWORD2)
+            time.sleep(DELAY)
+            attempts += 1
+
     if wlan.isconnected():
+        connection_label.set_text('Connected to WiFi')
         return True
     else:
         connection_label.set_text('Connection failed after {} attempts.'.format(MAX_RETRIES))
