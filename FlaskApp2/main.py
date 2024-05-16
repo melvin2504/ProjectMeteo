@@ -122,14 +122,12 @@ def historical_data_graph():
     plt.plot(filtered_df['time_only'], filtered_df['indoor_temp'], marker='o')
     plt.title('Indoor Temperature (Last 25 Measurements)')
     plt.ylabel('Temperature (°C)')
-    plt.xticks(rotation=45)
     plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=10))  # Adjust nbins as needed
 
     plt.subplot(3, 1, 2)
     plt.plot(filtered_df['time_only'], filtered_df['indoor_humidity'], marker='o', color='orange')
     plt.title('Indoor Humidity (Last 25 Measurements)')
     plt.ylabel('Humidity (%)')
-    plt.xticks(rotation=45)
     plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=10))  # Adjust nbins as needed
 
     plt.subplot(3, 1, 3)
@@ -137,7 +135,6 @@ def historical_data_graph():
     plt.title('Indoor Air Quality (TVOC) (Last 25 Measurements)')
     plt.ylabel('TVOC (ppb)')
     plt.xlabel('Time')
-    plt.xticks(rotation=45)
     plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=10))  # Adjust nbins as needed
     
     plt.tight_layout()
