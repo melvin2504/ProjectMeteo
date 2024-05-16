@@ -5,7 +5,9 @@ from weather import get_weather, get_daily_forecast, weather_icons
 from google_cloud_utils import insert_data_to_bigquery, query_latest_weather, query_latest_data
 from config import OPENWEATHER_API_KEY, YOUR_HASH_PASSWD, GCP_PROJECT_ID
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import pandas as pd
+import tempfile
 import os
 
 # Uncomment the line below if you want to run your flask app locally.
@@ -110,34 +112,49 @@ def historical_data_graph():
     # Query the latest data from BigQuery
     filtered_df = query_latest_data(client, GCP_PROJECT_ID, "weather_IoT_data", "weather-records")
     
+    # Format datetime column to only show time
+    filtered_df['time_only'] = filtered_df['datetime'].dt.strftime('%H:%M:%S')
+    
     # Plot the data
     plt.figure(figsize=(10, 6))
 
     plt.subplot(3, 1, 1)
-    plt.plot(filtered_df['datetime'], filtered_df['indoor_temp'], marker='o')
-    plt.title('Indoor Temperature over the Last 6 Hours')
+    plt.plot(filtered_df['time_only'], filtered_df['indoor_temp'], marker='o')
+    plt.title('Indoor Temperature (Last 25 Measurements)')
     plt.ylabel('Temperature (°C)')
-    
+    plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=10))  # Adjust nbins as needed
+
     plt.subplot(3, 1, 2)
-    plt.plot(filtered_df['datetime'], filtered_df['indoor_humidity'], marker='o', color='orange')
-    plt.title('Indoor Humidity over the Last 6 Hours')
+    plt.plot(filtered_df['time_only'], filtered_df['indoor_humidity'], marker='o', color='orange')
+    plt.title('Indoor Humidity (Last 25 Measurements)')
     plt.ylabel('Humidity (%)')
-    
+    plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=10))  # Adjust nbins as needed
+
     plt.subplot(3, 1, 3)
-    plt.plot(filtered_df['datetime'], filtered_df['indoor_tvoc'], marker='o', color='green')
-    plt.title('Indoor Air Quality (TVOC) over the Last 6 Hours')
+    plt.plot(filtered_df['time_only'], filtered_df['indoor_tvoc'], marker='o', color='green')
+    plt.title('Indoor Air Quality (TVOC) (Last 25 Measurements)')
     plt.ylabel('TVOC (ppb)')
     plt.xlabel('Time')
+    plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=10))  # Adjust nbins as needed
     
     plt.tight_layout()
 
-    # Save the plot to a file
-    plot_path = '/mnt/data/indoor_data_plot.png'
-    plt.savefig(plot_path)
+    # Save the plot to a temporary file and read it into memory
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
+        plt.savefig(tmpfile.name)
+        tmpfile.seek(0)
+        plot_data = tmpfile.read()
+    
     plt.close()
 
-    # Return the plot as an image
-    return send_file(plot_path, mimetype='image/png')
+    # Create a response with the image data
+    response = Response(plot_data, mimetype='image/png')
+    response.headers['Content-Disposition'] = 'attachment; filename=indoor_data_plot.png'
+    
+    # Remove the temporary file
+    os.remove(tmpfile.name)
+
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
