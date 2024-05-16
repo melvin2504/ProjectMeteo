@@ -4,12 +4,7 @@ from uiflow import *
 import time
 import unit
 import urequests
-import hashlib
-import binascii
-import ntptime
-import machine
-import wifiCfg
-
+import network
 
 # Initialize the screen and units
 screen = M5Screen()
@@ -19,17 +14,26 @@ env3_0 = unit.get(unit.ENV3, unit.PORTA)
 motion_sensor = unit.get(unit.PIR, unit.PORTB)
 tvoc0 = unit.get(unit.TVOC, unit.PORTC)
 
-# Wi-Fi credentials
-SSID = "Galaxy S20 FE 5GDEE0"
-PASSWORD = "........"
+# Wi-Fi credentials (default)
+SSID1 = "Galaxy S20 FE 5GDEE0"
+PASSWORD1 = "........"
+SSID2 = "Galaxy S20 FE 5GDEE0"
+PASSWORD2 = "........"
 
-# Connect to Wi-Fi
-wifiCfg.doConnect(SSID, PASSWORD)
-while not wifiCfg.wlan_sta.isconnected():
-    wait_ms(500)
-    print("Connecting to Wi-Fi...")
+# Global variable to hold the selected SSID and password
+selected_ssid = SSID1
+selected_password = PASSWORD1
 
-print("Connected to Wi-Fi")
+# Constants for Wi-Fi connection attempts
+MAX_RETRIES = 3
+DELAY = 10  # Delay between attempts in seconds
+
+# Global variables for connection state and UI initialization
+wifi_connecting = False
+wifi_retry = False
+ui_initialized = False
+connection_attempts = 0
+next_connection_attempt = 0
 
 # Initialize variables and constants
 temp_flag = 300
@@ -42,6 +46,9 @@ LOW_HUMIDITY_THRESHOLD = 30  # Low humidity threshold (30%)
 HIGH_HUMIDITY_THRESHOLD = 70  # High humidity threshold (70%)
 POOR_AIR_QUALITY_THRESHOLD = 1000  # Poor air quality threshold (1000 ppb TVOC)
 ELEVATED_ECO2_THRESHOLD = 1000  # Elevated eCO2 threshold (1000 ppm)
+
+# Initialize labels
+alert_message = None
 
 # Password hash (example hash)
 passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
@@ -140,7 +147,7 @@ def update_forecast_display():
     clear_forecast_display()  # Clear existing forecast display before updating
     
     forecast_data = fetch_forecast()
-    if forecast_data:
+    if (forecast_data is not None) and (len(forecast_data) > 0):
         start_x = 20
         y = 55
         x_offset = 60
@@ -169,33 +176,90 @@ def update_forecast_display():
         no_data_label = M5Label("No forecast data available", x=20, y=30, color=0x000, font=FONT_MONT_10, parent=None)
         forecast_ui_elements.append(no_data_label)
 
-# Display labels for date, time, temperature, and humidity
-date_label = M5Label('Date', x=19, y=20, color=0x000, font=FONT_MONT_18, parent=None)
-time_label = M5Label('Time', x=230, y=20, color=0x000, font=FONT_MONT_18, parent=None)
-temperature_icon = M5Img('res/icons8-temperature-32.png', x=19, y=155, parent=None)
-humidity_icon = M5Img('res/icons8-humidity-32.png', x=19, y=200, parent=None)
-inlabel = M5Label('In', x=76, y=147, color=0x000, font=FONT_MONT_10, parent=None)
-outlabel = M5Label('Out', x=151, y=147, color=0x000, font=FONT_MONT_10, parent=None)
-label0 = M5Label('T', x=63, y=162, color=0x000, font=FONT_MONT_22, parent=None)
-label1 = M5Label('H', x=63, y=203, color=0x000, font=FONT_MONT_22, parent=None)
-label2 = M5Label('OT', x=143, y=162, color=0x000, font=FONT_MONT_22, parent=None)
-label3 = M5Label('OH', x=143, y=203, color=0x000, font=FONT_MONT_22, parent=None)
 
-# Display labels for air quality data
-air_quality_icon = M5Img('res/icons8-air-16.png', x=200, y=168, parent=None)
-tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=166, color=0x000, font=FONT_MONT_10, parent=None)
-eco2_label = M5Label('eCO2: 0 ppm', x=230, y=186, color=0x000, font=FONT_MONT_10, parent=None)
+# Function to initialize the main screen UI
+def init_main_screen():
+    screen.clean_screen()
+    global state, ui_initialized
+    ui_initialized = True
+    # Re-create the main screen UI elements
+    global date_label, time_label, temperature_icon, humidity_icon
+    global inlabel, outlabel, label0, label1, label2, label3
+    global air_quality_icon, tvoc_label, eco2_label, alert_message
+    
+    date_label = M5Label('Date', x=19, y=20, color=0x000, font=FONT_MONT_18, parent=None)
+    time_label = M5Label('Time', x=230, y=20, color=0x000, font=FONT_MONT_18, parent=None)
+    
+    temperature_icon = M5Img('res/icons8-temperature-32.png', x=19, y=155, parent=None)
+    humidity_icon = M5Img('res/icons8-humidity-32.png', x=19, y=200, parent=None)
+    
+    inlabel = M5Label('In', x=76, y=147, color=0x000, font=FONT_MONT_10, parent=None)
+    outlabel = M5Label('Out', x=151, y=147, color=0x000, font=FONT_MONT_10, parent=None)
+    
+    label0 = M5Label('T', x=63, y=162, color=0x000, font=FONT_MONT_22, parent=None)
+    label1 = M5Label('H', x=63, y=203, color=0x000, font=FONT_MONT_22, parent=None)
+    label2 = M5Label('OT', x=143, y=162, color=0x000, font=FONT_MONT_22, parent=None)
+    label3 = M5Label('OH', x=143, y=203, color=0x000, font=FONT_MONT_22, parent=None)
+    
+    air_quality_icon = M5Img('res/icons8-air-16.png', x=200, y=168, parent=None)
+    tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=166, color=0x000, font=FONT_MONT_10, parent=None)
+    eco2_label = M5Label('eCO2: 0 ppm', x=230, y=186, color=0x000, font=FONT_MONT_10, parent=None)
+    
+    alert_message = M5Label('', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+    
+    update_forecast_display()
 
-# Label for displaying alert messages
-alert_message = M5Label('', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+# Function to connect to Wi-Fi with retry logic in non-blocking manner
+def connect_wifi_non_blocking():
+    global wifi_connecting, connection_attempts, alert_message, next_connection_attempt
+    current_time = time.ticks_ms()
+    if current_time >= next_connection_attempt:
+        wlan = network.WLAN(network.STA_IF)
+        wlan.active(True)
+        if not wlan.isconnected() and connection_attempts < MAX_RETRIES:
+            if alert_message is None:
+                alert_message = M5Label('Connecting... Attempt {}'.format(connection_attempts + 1), x=20, y=50, color=0x000, font=FONT_MONT_18, parent=None)
+            else:
+                alert_message.set_text('Connecting... Attempt {}'.format(connection_attempts + 1))
+            wlan.connect(selected_ssid, selected_password)
+            connection_attempts += 1
+            wifi_connecting = True
+        elif wlan.isconnected():
+            if alert_message is not None:
+                alert_message.set_text('Connected!')
+            wifi_connecting = False
+            connection_attempts = 0  # Reset connection attempts
+        else:
+            if alert_message is not None:
+                alert_message.set_text('Connection failed after {} attempts.'.format(MAX_RETRIES))
 
-# Hash the password
-passwd = "vendgelanonoarnaknonoob"
-h = hashlib.sha256(passwd.encode('utf-8'))
-passwd_hash = binascii.hexlify(h.digest()).decode('utf-8')
+# Function to check Wi-Fi connection and reconnect if necessary
+def check_wifi_connection():
+    wlan = network.WLAN(network.STA_IF)
+    if not wlan.isconnected():
+        global wifi_retry
+        wifi_retry = True
 
-# Main loop
+# Connect to Wi-Fi initially
+wifi_retry = True
+
 while True:
+    # Initialize the main UI if not already initialized
+    if not ui_initialized:
+        init_main_screen()
+    
+    if wifi_retry:
+        connect_wifi_non_blocking()
+        wifi_retry = False
+    
+    if wifi_connecting:
+        connect_wifi_non_blocking()
+    
+    check_wifi_connection()  # Check Wi-Fi connection periodically
+
+    if not wifi_connecting and wifi_retry:
+        connect_wifi_non_blocking()
+    
     # Update date and time labels
     date_string, time_string = get_datetime_strings()
     date_label.set_text(date_string)
@@ -221,6 +285,7 @@ while True:
     
     # Send data to BigQuery every 5 minutes
     if temp_flag >= 300:
+        date_string, time_string = get_datetime_strings()
         data = {
             "passwd": passwd_hash,
             "values": {
@@ -242,6 +307,3 @@ while True:
 
     # Wait for one second before the next iteration
     wait_ms(1000)
-
-
-
