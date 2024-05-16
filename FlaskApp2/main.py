@@ -109,7 +109,7 @@ def historical_data_graph():
         return jsonify({"error": "Incorrect Password!"}), 401
 
     # Query the latest data from BigQuery
-    filtered_df = query_latest_data(client, GCP_PROJECT_ID, "weather_IoT_data", "weather-records")
+    df = query_latest_data(client, GCP_PROJECT_ID, "weather_IoT_data", "weather-records")
     
     # Plot the data
     plt.figure(figsize=(10, 6))
