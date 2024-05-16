@@ -7,4 +7,3 @@ requests
 pandas
 matplotlib
 datetime
-tempfile
