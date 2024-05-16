@@ -15,18 +15,18 @@ motion_sensor = unit.get(unit.PIR, unit.PORTB)
 tvoc0 = unit.get(unit.TVOC, unit.PORTC)
 
 # Wi-Fi credentials (default)
-SSID1 = "Galaxy S20 FE 5GDEE0"
-PASSWORD1 = "........"
+SSID1 = "iot-unil"
+PASSWORD1 = "4u6uch4hpY9pJ2f9"
 SSID2 = "Galaxy S20 FE 5GDEE0"
 PASSWORD2 = "........"
 
 # Global variable to hold the selected SSID and password
-selected_ssid = SSID1
-selected_password = PASSWORD1
+ssid = SSID1
+password = PASSWORD1
 
 # Constants for Wi-Fi connection attempts
-MAX_RETRIES = 3
-DELAY = 10  # Delay between attempts in seconds
+MAX_RETRIES = 10
+DELAY = 2  # Delay between attempts in seconds
 
 # Global variables for connection state and UI initialization
 wifi_connecting = False
@@ -53,8 +53,7 @@ alert_message = None
 # Password hash (example hash)
 passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
 
-# Set up the RTC to sync time via NTP
-rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
+
 
 # Function to check for motion and fetch advice if motion is detected
 def check_motion():
@@ -97,7 +96,7 @@ def get_datetime_strings():
 
 # Function to fetch outdoor weather data
 def fetch_outdoor_weather():
-    url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+    url = 'https://flaskapp5-vukguwbvha-oa.a.run.app/get_outdoor_weather'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
     if response.status_code == 200:
@@ -110,7 +109,7 @@ def fetch_outdoor_weather():
 def fetch_and_play_advice():
     outdoor_weather = fetch_outdoor_weather()
     if outdoor_weather:
-        url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/generate_advice_audio'
+        url = 'https://flaskapp5-vukguwbvha-oa.a.run.app/generate_advice_audio'
         headers = {'Content-Type': 'application/json'}
         response = urequests.post(url, json=outdoor_weather, headers=headers)
         if response.status_code == 200:
@@ -122,7 +121,7 @@ def fetch_and_play_advice():
 
 # Function to fetch forecast data
 def fetch_forecast():
-    url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/get_daily_forecast'
+    url = 'https://flaskapp5-vukguwbvha-oa.a.run.app/get_daily_forecast'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash, "city": {"lat": 46.5196535, "lon": 6.6322734}}, headers=headers)  # Lausanne
     if response.status_code == 200:
@@ -205,33 +204,33 @@ def init_main_screen():
     tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=166, color=0x000, font=FONT_MONT_10, parent=None)
     eco2_label = M5Label('eCO2: 0 ppm', x=230, y=186, color=0x000, font=FONT_MONT_10, parent=None)
     
-    alert_message = M5Label('', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+    alert_message = M5Label('hello', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+    
+    # Set up the RTC to sync time via NTP
+    rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
     
     update_forecast_display()
 
-# Function to connect to Wi-Fi with retry logic in non-blocking manner
-def connect_wifi_non_blocking():
-    global wifi_connecting, connection_attempts, alert_message, next_connection_attempt
-    current_time = time.ticks_ms()
-    if current_time >= next_connection_attempt:
-        wlan = network.WLAN(network.STA_IF)
-        wlan.active(True)
-        if not wlan.isconnected() and connection_attempts < MAX_RETRIES:
-            if alert_message is None:
-                alert_message = M5Label('Connecting... Attempt {}'.format(connection_attempts + 1), x=20, y=50, color=0x000, font=FONT_MONT_18, parent=None)
-            else:
-                alert_message.set_text('Connecting... Attempt {}'.format(connection_attempts + 1))
-            wlan.connect(selected_ssid, selected_password)
-            connection_attempts += 1
-            wifi_connecting = True
-        elif wlan.isconnected():
-            if alert_message is not None:
-                alert_message.set_text('Connected!')
-            wifi_connecting = False
-            connection_attempts = 0  # Reset connection attempts
-        else:
-            if alert_message is not None:
-                alert_message.set_text('Connection failed after {} attempts.'.format(MAX_RETRIES))
+def connect_wifi():
+    """Connects to WiFi with retry logic."""
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    attempts = 0
+
+    # Create a label for connection status
+    connection_label = M5Label('', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+
+    while not wlan.isconnected() and attempts < MAX_RETRIES:
+        connection_label.set_text('Connecting... Attempt {}'.format(attempts + 1))
+        wlan.connect(ssid, password)
+        time.sleep(DELAY)
+        attempts += 1
+
+    if wlan.isconnected():
+        return True
+    else:
+        connection_label.set_text('Connection failed after {} attempts.'.format(MAX_RETRIES))
+        return False
 
 # Function to check Wi-Fi connection and reconnect if necessary
 def check_wifi_connection():
@@ -244,21 +243,21 @@ def check_wifi_connection():
 wifi_retry = True
 
 while True:
-    # Initialize the main UI if not already initialized
-    if not ui_initialized:
-        init_main_screen()
-    
     if wifi_retry:
-        connect_wifi_non_blocking()
+        connect_wifi()
         wifi_retry = False
     
     if wifi_connecting:
-        connect_wifi_non_blocking()
+        connect_wifi()
     
     check_wifi_connection()  # Check Wi-Fi connection periodically
 
     if not wifi_connecting and wifi_retry:
-        connect_wifi_non_blocking()
+        connect_wifi()
+        
+    # Initialize the main UI if not already initialized
+    if not ui_initialized:
+        init_main_screen()
     
     # Update date and time labels
     date_string, time_string = get_datetime_strings()
@@ -285,19 +284,19 @@ while True:
     
     # Send data to BigQuery every 5 minutes
     if temp_flag >= 300:
-        date_string, time_string = get_datetime_strings()
+        #date_string, time_string = get_datetime_strings()
         data = {
             "passwd": passwd_hash,
             "values": {
-                "date": date_string,
-                "time": time_string,
+                #"date": date_string,
+                #"time": time_string,
                 "indoor_temp": round(env3_0.temperature),
                 "indoor_humidity": round(env3_0.humidity),
                 "indoor_tvoc": tvoc0.TVOC,
                 "indoor_eco2": tvoc0.eCO2
             }
         }
-        urequests.post("https://flaskapp4-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
+        urequests.post("https://flaskapp5-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
         temp_flag = 0  # Reset the counter
     
     temp_flag += 1
