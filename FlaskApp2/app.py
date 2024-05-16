@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, Response
 from google.cloud import bigquery, texttospeech
 from weather import get_weather, get_daily_forecast, weather_icons
 from openai_utils import generate_weather_advice
-from google_cloud_utils import insert_data_to_bigquery, query_latest_weather
+from google_cloud_utils import insert_data_to_bigquery, query_latest_weather, query_latest_data
 from config import OPENWEATHER_API_KEY, YOUR_HASH_PASSWD, GCP_PROJECT_ID
 import os
 
