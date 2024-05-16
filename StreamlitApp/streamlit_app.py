@@ -193,7 +193,7 @@ def render_basic_bar():
 def round_time_to_nearest_hour(time):
     return (time + timedelta(minutes=30)).replace(minute=0, second=0, microsecond=0)
 
-
+#skkr samarche
 def render_heatmap_2(data):
     if data:
         # Convert the data into a DataFrame
