@@ -216,7 +216,7 @@ def connect_wifi():
     attempts = 0
 
     # Create a label for connection status
-    connection_label = M5Label('', x=150, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+    connection_label = M5Label('', x=5, y=82, color=0xff0000, font=FONT_MONT_10, parent=None)
 
     # Try connecting to the first network
     while not wlan.isconnected() and attempts < MAX_RETRIES:
@@ -235,7 +235,7 @@ def connect_wifi():
             attempts += 1
 
     if wlan.isconnected():
-        connection_label.set_text('Connected to WiFi')
+        connection_label.set_text('')
         return True
     else:
         connection_label.set_text('Connection failed after {} attempts.'.format(MAX_RETRIES))
