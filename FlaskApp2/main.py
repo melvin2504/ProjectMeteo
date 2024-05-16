@@ -109,23 +109,23 @@ def historical_data_graph():
         return jsonify({"error": "Incorrect Password!"}), 401
 
     # Query the latest data from BigQuery
-    df = query_latest_data(client, GCP_PROJECT_ID, "weather_IoT_data", "weather-records")
+    filtered_df = query_latest_data(client, GCP_PROJECT_ID, "weather_IoT_data", "weather-records")
     
     # Plot the data
     plt.figure(figsize=(10, 6))
 
     plt.subplot(3, 1, 1)
-    plt.plot(df['time'], df['indoor_temp'], marker='o')
+    plt.plot(filtered_df['datetime'], filtered_df['indoor_temp'], marker='o')
     plt.title('Indoor Temperature (Last 25 Measurements)')
     plt.ylabel('Temperature (°C)')
     
     plt.subplot(3, 1, 2)
-    plt.plot(df['time'], df['indoor_humidity'], marker='o', color='orange')
+    plt.plot(filtered_df['datetime'], filtered_df['indoor_humidity'], marker='o', color='orange')
     plt.title('Indoor Humidity (Last 25 Measurements)')
     plt.ylabel('Humidity (%)')
     
     plt.subplot(3, 1, 3)
-    plt.plot(df['time'], df['indoor_tvoc'], marker='o', color='green')
+    plt.plot(filtered_df['datetime'], filtered_df['indoor_tvoc'], marker='o', color='green')
     plt.title('Indoor Air Quality (TVOC) (Last 25 Measurements)')
     plt.ylabel('TVOC (ppb)')
     plt.xlabel('Time')
