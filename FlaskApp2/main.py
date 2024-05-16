@@ -132,15 +132,22 @@ def historical_data_graph():
     
     plt.tight_layout()
 
-    # Save the plot to a temporary file
+    # Save the plot to a temporary file and read it into memory
     with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
         plt.savefig(tmpfile.name)
-        plot_path = tmpfile.name
+        tmpfile.seek(0)
+        plot_data = tmpfile.read()
     
     plt.close()
 
-    # Return the plot as an image
-    return send_file(plot_path, mimetype='image/png')
+    # Create a response with the image data
+    response = Response(plot_data, mimetype='image/png')
+    response.headers['Content-Disposition'] = 'attachment; filename=indoor_data_plot.png'
+    
+    # Remove the temporary file
+    os.remove(tmpfile.name)
+
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
