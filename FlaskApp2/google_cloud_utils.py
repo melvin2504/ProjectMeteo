@@ -31,6 +31,9 @@ def query_latest_data(client, project_id, dataset_id, table_id):
     df['date'] = df['date'].astype(str)
     df['time'] = df['time'].astype(str)
     df['datetime'] = pd.to_datetime(df['date'] + ' ' + df['time'])
+
+    # Sort DataFrame by datetime
+    df = df.sort_values(by='datetime')
     
     filtered_df = df[df['datetime'] >= six_hours_ago]
     return filtered_df
