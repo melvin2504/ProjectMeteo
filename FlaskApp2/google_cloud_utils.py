@@ -20,7 +20,7 @@ def query_latest_data(client, project_id, dataset_id, table_id):
         SELECT *
         FROM `{project_id}.{dataset_id}.{table_id}`
         ORDER BY date DESC, time DESC
-        LIMIT 1000
+        LIMIT 25
     """
     query_job = client.query(query)
     df = query_job.to_dataframe()
