@@ -6,6 +6,7 @@ from google_cloud_utils import insert_data_to_bigquery, query_latest_weather, qu
 from config import OPENWEATHER_API_KEY, YOUR_HASH_PASSWD, GCP_PROJECT_ID
 import matplotlib.pyplot as plt
 import pandas as pd
+import tempfile
 import os
 
 # Uncomment the line below if you want to run your flask app locally.
@@ -115,25 +116,27 @@ def historical_data_graph():
 
     plt.subplot(3, 1, 1)
     plt.plot(filtered_df['datetime'], filtered_df['indoor_temp'], marker='o')
-    plt.title('Indoor Temperature over the Last 6 Hours')
+    plt.title('Indoor Temperature (Last 10 Measurements)')
     plt.ylabel('Temperature (°C)')
     
     plt.subplot(3, 1, 2)
     plt.plot(filtered_df['datetime'], filtered_df['indoor_humidity'], marker='o', color='orange')
-    plt.title('Indoor Humidity over the Last 6 Hours')
+    plt.title('Indoor Humidity (Last 10 Measurements)')
     plt.ylabel('Humidity (%)')
     
     plt.subplot(3, 1, 3)
     plt.plot(filtered_df['datetime'], filtered_df['indoor_tvoc'], marker='o', color='green')
-    plt.title('Indoor Air Quality (TVOC) over the Last 6 Hours')
+    plt.title('Indoor Air Quality (TVOC) (Last 10 Measurements)')
     plt.ylabel('TVOC (ppb)')
     plt.xlabel('Time')
     
     plt.tight_layout()
 
-    # Save the plot to a file
-    plot_path = '/mnt/data/indoor_data_plot.png'
-    plt.savefig(plot_path)
+    # Save the plot to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
+        plt.savefig(tmpfile.name)
+        plot_path = tmpfile.name
+    
     plt.close()
 
     # Return the plot as an image
