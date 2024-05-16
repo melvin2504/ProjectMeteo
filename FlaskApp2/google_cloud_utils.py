@@ -1,6 +1,7 @@
 from google.cloud import bigquery
 from google.cloud import texttospeech
 from datetime import datetime, timedelta  # Import datetime and timedelta
+import pandas as pd
 
 def insert_data_to_bigquery(client, data):
     """Inserts weather data into BigQuery."""
