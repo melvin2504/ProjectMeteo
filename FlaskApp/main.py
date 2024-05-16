@@ -7,7 +7,7 @@ from datetime import datetime
 from openai import OpenAI
 
 # You only need to uncomment the line below if you want to run your flask app locally.
-#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./lab-test-1-415115-c2f0b755d8b4.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./lab-test-1-415115-c2f0b755d8b4.json"
 
 # Initialize the OpenAI client
 clientAI = OpenAI(
@@ -100,6 +100,29 @@ def get_weather(api_key, city):
         print(f"An error occurred: {e}")
         return None
 
+def fetch_hourly_max_for_last_7_days():
+    query = """
+    SELECT 
+        DATETIME_TRUNC(DATETIME(date, time), HOUR) as hour, 
+        MAX(outdoor_temp) as max_outdoor_temp, 
+        MAX(outdoor_humidity) as max_outdoor_humidity
+    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
+    WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
+    GROUP BY hour
+    ORDER BY hour DESC
+    """
+    query_job = client.query(query)
+    results = query_job.result()
+    hourly_data = []
+    for row in results:
+        hourly_data.append({
+            "hour": row.hour,
+            "max_outdoor_temp": row.max_outdoor_temp,
+            "max_outdoor_humidity": row.max_outdoor_humidity
+        })
+    return hourly_data
+
+
 @app.route('/')
 def index():
     return "Welcome to the Weather App!"
@@ -126,6 +149,11 @@ def get_latest_temperature():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+@app.route('/hourly-max', methods=['POST'])
+def get_hourly_max():
+    data = fetch_hourly_max_for_last_7_days()
+    return jsonify(data)
+
 def generate_weather_advice(outdoor_temp, outdoor_weather):
     """
     Generate weather advice using GPT-3.5 based on the provided temperature and weather conditions.

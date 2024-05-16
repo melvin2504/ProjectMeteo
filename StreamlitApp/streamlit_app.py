@@ -4,10 +4,10 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from streamlit_echarts import st_echarts
-from datetime import datetime
-import random
+from datetime import datetime, timedelta
 import requests
 from PIL import Image
+import pytz
 
 YOUR_HASH_PASSWD = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,7 +43,15 @@ def fetch_daily_forecast(city_lat, city_lon, password):
     else:
         st.error(f"Failed to retrieve forecast: {response.json().get('error', 'Unknown error')}")
         return None
-    
+
+def fetch_hourly_max(password):
+    response = requests.post("http://localhost:8080/hourly-max", json={"password": password})
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error("Failed to fetch hourly max data")
+        return None 
+
 def temp_gauge():
     latest_temp = fetch_latest_temperature()
     st.write(f"Latest temperature: {latest_temp} °C")
@@ -182,6 +190,163 @@ def render_basic_bar():
     }
     st_echarts(options=option, height="400px")
 
+def round_time_to_nearest_hour(time):
+    return (time + timedelta(minutes=30)).replace(minute=0, second=0, microsecond=0)
+
+
+def render_heatmap_2(data):
+    if data:
+        # Convert the data into a DataFrame
+        df = pd.DataFrame(data)
+        df['hour'] = pd.to_datetime(df['hour'])
+
+        # Define the timezone for UTC+1
+        local_tz = pytz.timezone('Etc/GMT-1')
+
+        # Convert 'hour' column to local time and round to nearest hour
+        df['hour'] = df['hour'].apply(lambda x: round_time_to_nearest_hour(x + timedelta(hours=1)))
+
+        # Generate list of the last 7 days with hours
+        end_date = datetime.now(local_tz)
+        start_date = end_date - timedelta(days=6)
+        days = [(end_date - timedelta(days=i)).strftime('%A') for i in range(7)][::-1]
+
+        # Specified hours for display
+        hours = [
+            '12am', '1am', '2am', '3am', '4am', '5am', '6am',
+            '7am', '8am', '9am', '10am', '11am',
+            '12pm', '1pm', '2pm', '3pm', '4pm', '5pm',
+            '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'
+        ]
+
+        # Create a dictionary to hold the hourly max data
+        temp_dict = {(day, hour): None for day in days for hour in hours}
+        humidity_dict = {(day, hour): None for day in days for hour in hours}
+
+        # Fill the dictionary with the data
+        for _, row in df.iterrows():
+            day_str = row['hour'].strftime('%A')
+            hour_str = row['hour'].strftime('%I%p').lstrip('0').lower()
+            temp_dict[(day_str, hour_str)] = row['max_outdoor_temp']
+            humidity_dict[(day_str, hour_str)] = row['max_outdoor_humidity']
+
+        # Prepare data for the heatmap
+        temp_data = []
+        humidity_data = []
+        for day in days:
+            for hour in hours:
+                temp_value = temp_dict.get((day, hour), None)
+                humidity_value = humidity_dict.get((day, hour), None)
+                if temp_value is not None:
+                    temp_data.append([hours.index(hour), days.index(day), temp_value])
+                if humidity_value is not None:
+                    humidity_data.append([hours.index(hour), days.index(day), humidity_value])
+
+        # Define heatmap options for temperature
+        temp_heatmap_options = {
+            "tooltip": {
+                "position": "top"
+            },
+            "grid": {
+                "height": "50%",
+                "top": "10%"
+            },
+            "xAxis": {
+                "type": "category",
+                "data": hours,
+                "splitArea": {
+                    "show": True
+                }
+            },
+            "yAxis": {
+                "type": "category",
+                "data": days,
+                "splitArea": {
+                    "show": True
+                }
+            },
+            "visualMap": {
+                "min": df['max_outdoor_temp'].min(),
+                "max": df['max_outdoor_temp'].max(),
+                "calculable": True,
+                "orient": "horizontal",
+                "left": "center",
+                "bottom": "15%"
+            },
+            "series": [{
+                "name": "Max Outdoor Temperature",
+                "type": "heatmap",
+                "data": temp_data,
+                "label": {
+                    "show": True
+                },
+                "emphasis": {
+                    "itemStyle": {
+                        "shadowBlur": 10,
+                        "shadowColor": "rgba(0, 0, 0, 0.5)"
+                    }
+                }
+            }]
+        }
+
+        # Define heatmap options for humidity
+        humidity_heatmap_options = {
+            "tooltip": {
+                "position": "top"
+            },
+            "grid": {
+                "height": "50%",
+                "top": "10%"
+            },
+            "xAxis": {
+                "type": "category",
+                "data": hours,
+                "splitArea": {
+                    "show": True
+                }
+            },
+            "yAxis": {
+                "type": "category",
+                "data": days,
+                "splitArea": {
+                    "show": True
+                }
+            },
+            "visualMap": {
+                "min": df['max_outdoor_humidity'].min(),
+                "max": df['max_outdoor_humidity'].max(),
+                "calculable": True,
+                "orient": "horizontal",
+                "left": "center",
+                "bottom": "15%"
+            },
+            "series": [{
+                "name": "Max Outdoor Humidity",
+                "type": "heatmap",
+                "data": humidity_data,
+                "label": {
+                    "show": True
+                },
+                "emphasis": {
+                    "itemStyle": {
+                        "shadowBlur": 10,
+                        "shadowColor": "rgba(0, 0, 0, 0.5)"
+                    }
+                }
+            }]
+        }
+
+        # Render heatmaps
+        st.write("## Heatmap of Max Outdoor Temperature")
+        st_echarts(options=temp_heatmap_options, height="500px")
+
+        st.write("## Heatmap of Max Outdoor Humidity")
+        st_echarts(options=humidity_heatmap_options, height="500px")
+
+
+
+
+
 def render_heatmap():
     # Time slots and days
     hours = [
@@ -278,7 +443,9 @@ if __name__ == "__main__":
     city_lat = 46.5197
     city_lon = 6.6323
     forecast = fetch_daily_forecast(city_lat, city_lon, YOUR_HASH_PASSWD)
+    hourly = fetch_hourly_max(YOUR_HASH_PASSWD)
     display_forecast(forecast)
+    render_heatmap_2(hourly)
     render_basic_bar()
     temp_gauge()
     render_heatmap()    
