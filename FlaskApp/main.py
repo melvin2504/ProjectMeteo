@@ -240,7 +240,7 @@ def send_to_bigquery():
 @app.route('/get_outdoor_weather', methods=['POST'])
 def get_outdoor_weather():
     # Verify password from the request
-    if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
+    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
     
     # Query to select the latest outdoor temperature, humidity, and description records
