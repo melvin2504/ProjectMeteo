@@ -1,6 +1,6 @@
 from google.cloud import bigquery
 from google.cloud import texttospeech
-from datetime import datetime, timedelta  # Import datetime and timedelta
+from datetime import datetime, timedelta
 import pandas as pd
 
 def insert_data_to_bigquery(client, data):
@@ -27,8 +27,9 @@ def query_latest_data(client, project_id, dataset_id, table_id):
     now = datetime.now()
     six_hours_ago = now - timedelta(hours=6)
     
-    # Convert the date column to string before concatenation
+    # Convert the date column to string and time column to string in the desired format before concatenation
     df['date'] = df['date'].astype(str)
+    df['time'] = df['time'].astype(str)
     df['datetime'] = pd.to_datetime(df['date'] + ' ' + df['time'])
     
     filtered_df = df[df['datetime'] >= six_hours_ago]
