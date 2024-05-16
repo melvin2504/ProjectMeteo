@@ -26,7 +26,11 @@ def query_latest_data(client, project_id, dataset_id, table_id):
     df = query_job.to_dataframe()
     now = datetime.now()
     six_hours_ago = now - timedelta(hours=6)
+    
+    # Convert the date column to string before concatenation
+    df['date'] = df['date'].astype(str)
     df['datetime'] = pd.to_datetime(df['date'] + ' ' + df['time'])
+    
     filtered_df = df[df['datetime'] >= six_hours_ago]
     return filtered_df
 
