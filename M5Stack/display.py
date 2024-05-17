@@ -1,6 +1,7 @@
 from m5stack import *
 from m5stack_ui import *
 from uiflow import *
+import gc
 import time
 import unit
 import urequests
@@ -173,9 +174,52 @@ def update_forecast_display():
         forecast_ui_elements.append(no_data_label)
 
 
+def fetch_and_display_graph():
+    url = 'https://flaskapp6-vukguwbvha-oa.a.run.app/historical_data_graph'
+    headers = {'Content-Type': 'application/json'}
+    graph_file_path = 'res/graph.png'
+    
+    try:
+        # Fetch the graph image from the server
+        response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
+        if response.status_code == 200:
+            with open(graph_file_path, 'wb') as f:
+                f.write(response.content)
+            
+            # Ensure the file was written correctly
+            file_size = os.stat(graph_file_path)[6]
+            if file_size != len(response.content):
+                alert_message.set_text("File size mismatch: expected {}, got {}".format(len(response.content) + str(file_size)))
+                return
+            
+            # Clean the screen before displaying the image
+            screen.clean_screen()
+            
+            # Perform garbage collection before displaying the image
+            gc.collect()
+            free_heap = gc.mem_free()
+            alert_message.set_text("Free heap memory before displaying image: " + str(free_heap))
+            
+            # Display the graph image
+            M5Img(graph_file_path, x=0, y=0, parent=None)
+            
+            # Check free heap memory after displaying the image
+            gc.collect()
+            free_heap = gc.mem_free()
+            alert_message.set_text("Free heap memory after displaying image: " + str(free_heap))
+        else:
+            alert_message.set_text("Failed to fetch graph image: " + str(response.status_code))
+    except Exception as e:
+        alert_message.set_text("Exception in fetch_and_display_graph: " + str(e))
+    
+    # Small delay to allow the system to process
+    time.sleep(0.1)
+
 # Function to initialize the main screen UI
 def init_main_screen():
     screen.clean_screen()
+    gc.collect()
+    free_heap = gc.mem_free()
     global state, ui_initialized
     ui_initialized = True
     # Re-create the main screen UI elements
@@ -309,9 +353,19 @@ while True:
         temp_flag = 0  # Reset the counter
     
     temp_flag += 1
-
+    
     # Check for motion and fetch advice if necessary
     check_motion()
-
-    # Wait for one second before the next iteration
+    free_heap = gc.mem_free()
+        # Show the graph image when button B is pressed
+    if btnB.isPressed():
+        fetch_and_display_graph()
+        
+        # Return to the main screen when button C is pressed
+    if btnC.isPressed():
+        init_main_screen()
     wait_ms(1000)
+
+
+
+
