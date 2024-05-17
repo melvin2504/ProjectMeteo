@@ -24,8 +24,6 @@ def query_latest_data(client, project_id, dataset_id, table_id):
     """
     query_job = client.query(query)
     df = query_job.to_dataframe()
-    now = datetime.now()
-    six_hours_ago = now - timedelta(hours=6)
     
     # Convert the date column to string and time column to string in the desired format before concatenation
     df['date'] = df['date'].astype(str)
@@ -35,8 +33,8 @@ def query_latest_data(client, project_id, dataset_id, table_id):
     # Sort DataFrame by datetime
     df = df.sort_values(by='datetime')
     
-    filtered_df = df[df['datetime'] >= six_hours_ago]
-    return filtered_df
+
+    return df
 
 def query_latest_weather(client):
     """Fetches the latest weather data from BigQuery."""
