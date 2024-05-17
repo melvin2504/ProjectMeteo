@@ -141,9 +141,10 @@ def historical_data_graph():
     plt.tight_layout()
 
     # Save the plot to a temporary file and read it into memory
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
+   with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
         plt.savefig(tmpfile.name)
-        tmpfile.seek(0)
+        plot_data = Image.open(tmpfile.name).resize((300, 220), Image.ANTIALIAS)  # Resize to fit M5Stack Core2 screen
+        plot_data.save(tmpfile.name, format='PNG')
         plot_data = tmpfile.read()
     
     plt.close()
