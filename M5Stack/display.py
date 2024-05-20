@@ -21,7 +21,6 @@ PASSWORD2 = "4u6uch4hpY9pJ2f9"
 SSID1 = "Galaxy S20 FE 5GDEE0"
 PASSWORD1 = "........"
 
-
 # Constants for Wi-Fi connection attempts
 MAX_RETRIES = 10
 DELAY = 2  # Delay between attempts in seconds
@@ -51,6 +50,10 @@ alert_message = None
 # Password hash (example hash)
 passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
 
+# Define states
+STATE_MAIN_SCREEN = 0
+STATE_GRAPH = 1
+current_state = STATE_MAIN_SCREEN
 
 
 # Function to check for motion and fetch advice if motion is detected
@@ -177,43 +180,20 @@ def update_forecast_display():
 def fetch_and_display_graph():
     url = 'https://flaskapp6-vukguwbvha-oa.a.run.app/historical_data_graph'
     headers = {'Content-Type': 'application/json'}
-    graph_file_path = 'res/graph.png'
+    graph_file_path = '/flash/graph.png'
     
-    try:
-        # Fetch the graph image from the server
-        response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
-        if response.status_code == 200:
-            with open(graph_file_path, 'wb') as f:
-                f.write(response.content)
-            
-            # Ensure the file was written correctly
-            file_size = os.stat(graph_file_path)[6]
-            if file_size != len(response.content):
-                alert_message.set_text("File size mismatch: expected {}, got {}".format(len(response.content) + str(file_size)))
-                return
-            
-            # Clean the screen before displaying the image
-            screen.clean_screen()
-            
-            # Perform garbage collection before displaying the image
-            gc.collect()
-            free_heap = gc.mem_free()
-            alert_message.set_text("Free heap memory before displaying image: " + str(free_heap))
-            
-            # Display the graph image
-            M5Img(graph_file_path, x=0, y=0, parent=None)
-            
-            # Check free heap memory after displaying the image
-            gc.collect()
-            free_heap = gc.mem_free()
-            alert_message.set_text("Free heap memory after displaying image: " + str(free_heap))
-        else:
-            alert_message.set_text("Failed to fetch graph image: " + str(response.status_code))
-    except Exception as e:
-        alert_message.set_text("Exception in fetch_and_display_graph: " + str(e))
+
+    response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
+    if response.status_code == 200:
+        with open(graph_file_path, 'wb') as f:
+            f.write(response.content)
+        screen.clean_screen()
+        # Display the graph image
+        M5Img(graph_file_path, x=0, y=0)
+    else:
+        alert_message.set_text("Failed to fetch graph image: " + str(response.status_code))
     
-    # Small delay to allow the system to process
-    time.sleep(0.1)
+    response.close()
 
 # Function to initialize the main screen UI
 def init_main_screen():
@@ -251,7 +231,6 @@ def init_main_screen():
     rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
     
     update_forecast_display()
-
 
 def connect_wifi():
     """Connects to WiFi with retry logic."""
@@ -357,15 +336,18 @@ while True:
     # Check for motion and fetch advice if necessary
     check_motion()
     free_heap = gc.mem_free()
-        # Show the graph image when button B is pressed
-    if btnB.isPressed():
-        fetch_and_display_graph()
         
-        # Return to the main screen when button C is pressed
-    if btnC.isPressed():
-        init_main_screen()
+    if current_state == STATE_MAIN_SCREEN:
+        # Check for button presses to switch to the graph state
+        if btnB.isPressed():
+            current_state = STATE_GRAPH
+            fetch_and_display_graph()
+        # Additional main screen logic
+    elif current_state == STATE_GRAPH:
+        # Check for button presses to switch back to the main screen
+        if btnC.isPressed():
+            current_state = STATE_MAIN_SCREEN
+            init_main_screen()
+        # Additional graph display logic
+
     wait_ms(1000)
-
-
-
-
