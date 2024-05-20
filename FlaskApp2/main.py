@@ -79,8 +79,8 @@ def get_outdoor_weather():
         return jsonify({"error": "Incorrect Password!"}), 401
 
     try:
-        weather_data = query_latest_weather(client)
-        icon_code = weather_icons.get(weather_data['outdoor_weather'], '01d')
+        weather_data = get_weather(client)
+        icon_code = weather_icons.get(weather_data[''], '01d')
         weather_data['icon_code'] = icon_code
         return jsonify(weather_data)
     except Exception as e:
