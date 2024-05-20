@@ -16,13 +16,13 @@ motion_sensor = unit.get(unit.PIR, unit.PORTB)
 tvoc0 = unit.get(unit.TVOC, unit.PORTC)
 
 # Wi-Fi credentials (default)
-SSID2 = "iot-unil"
-PASSWORD2 = "4u6uch4hpY9pJ2f9"
-SSID1 = "Galaxy S20 FE 5GDEE0"
-PASSWORD1 = "........"
+SSID1 = "iot-unil"
+PASSWORD1 = "4u6uch4hpY9pJ2f9"
+SSID2 = "Galaxy S20 FE 5GDEE0"
+PASSWORD2 = "........"
 
 # Constants for Wi-Fi connection attempts
-MAX_RETRIES = 10
+MAX_RETRIES = 5
 DELAY = 2  # Delay between attempts in seconds
 
 # Global variables for connection state and UI initialization
@@ -97,7 +97,7 @@ def get_datetime_strings():
 
 # Function to fetch outdoor weather data
 def fetch_outdoor_weather():
-    url = 'https://flaskapp5-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+    url = 'https://flaskapp6-vukguwbvha-oa.a.run.app/get_outdoor_weather'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
     if response.status_code == 200:
@@ -110,7 +110,7 @@ def fetch_outdoor_weather():
 def fetch_and_play_advice():
     outdoor_weather = fetch_outdoor_weather()
     if outdoor_weather:
-        url = 'https://flaskapp5-vukguwbvha-oa.a.run.app/generate_advice_audio'
+        url = 'https://flaskapp6-vukguwbvha-oa.a.run.app/generate_advice_audio'
         headers = {'Content-Type': 'application/json'}
         response = urequests.post(url, json=outdoor_weather, headers=headers)
         if response.status_code == 200:
@@ -122,7 +122,7 @@ def fetch_and_play_advice():
 
 # Function to fetch forecast data
 def fetch_forecast():
-    url = 'https://flaskapp5-vukguwbvha-oa.a.run.app/get_daily_forecast'
+    url = 'https://flaskapp6-vukguwbvha-oa.a.run.app/get_daily_forecast'
     headers = {'Content-Type': 'application/json'}
     response = urequests.post(url, json={"passwd": passwd_hash, "city": {"lat": 46.5196535, "lon": 6.6322734}}, headers=headers)  # Lausanne
     if response.status_code == 200:
@@ -178,6 +178,7 @@ def update_forecast_display():
 
 
 def fetch_and_display_graph():
+    global graph
     url = 'https://flaskapp6-vukguwbvha-oa.a.run.app/historical_data_graph'
     headers = {'Content-Type': 'application/json'}
     graph_file_path = '/flash/graph.png'
@@ -187,9 +188,8 @@ def fetch_and_display_graph():
     if response.status_code == 200:
         with open(graph_file_path, 'wb') as f:
             f.write(response.content)
-        screen.clean_screen()
         # Display the graph image
-        M5Img(graph_file_path, x=0, y=0)
+        graph = M5Img(graph_file_path, x=0, y=0)
     else:
         alert_message.set_text("Failed to fetch graph image: " + str(response.status_code))
     
@@ -229,8 +229,6 @@ def init_main_screen():
     
     # Set up the RTC to sync time via NTP
     rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
-    
-    update_forecast_display()
 
 def connect_wifi():
     """Connects to WiFi with retry logic."""
@@ -320,15 +318,15 @@ while True:
         data = {
             "passwd": passwd_hash,
             "values": {
-                #"date": date_string,
-                #"time": time_string,
+                "date": date_string,
+                "time": time_string,
                 "indoor_temp": round(env3_0.temperature),
                 "indoor_humidity": round(env3_0.humidity),
                 "indoor_tvoc": tvoc0.TVOC,
                 "indoor_eco2": tvoc0.eCO2
             }
         }
-        urequests.post("https://flaskapp5-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
+        urequests.post("https://flaskapp6-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
         temp_flag = 0  # Reset the counter
     
     temp_flag += 1
@@ -347,7 +345,7 @@ while True:
         # Check for button presses to switch back to the main screen
         if btnC.isPressed():
             current_state = STATE_MAIN_SCREEN
-            init_main_screen()
+            graph.set_hidden(True)
         # Additional graph display logic
 
     wait_ms(1000)
