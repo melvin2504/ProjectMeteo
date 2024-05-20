@@ -70,11 +70,7 @@ def get_weather(api_key, city):
         temperature = data['main']['temp']
         humidity = data['main']['humidity']
         description = data['weather'][0]['description']
-        return {
-            "temp": temperature,
-            "humidity": humidity,
-            "weather": description
-        }
+        return temperature, humidity, description
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
