@@ -80,7 +80,7 @@ def get_outdoor_weather():
 
     try:
         weather_data = get_weather(client)
-        icon_code = weather_icons.get(weather_data[''], '01d')
+        icon_code = weather_icons.get(weather_data['description'], '01d')
         weather_data['icon_code'] = icon_code
         return jsonify(weather_data)
     except Exception as e:
