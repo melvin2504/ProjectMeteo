@@ -4,15 +4,20 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 def insert_data_to_bigquery(client, data):
-    """Inserts weather data into BigQuery."""
+        # Prepare the query to insert data into BigQuery
     fields = ', '.join(data.keys())
     values = ', '.join([f"'{v}'" if isinstance(v, str) else str(v) for v in data.values()])
+    
     query = f"""
     INSERT INTO `lab-test-1-415115.weather_IoT_data.weather-records` ({fields})
     VALUES ({values})
     """
-    query_job = client.query(query)
-    query_job.result()  # Wait for the query job to complete
+    try:
+        query_job = client.query(query)
+        query_job.result()  # Wait for the query job to complete
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Function to query the latest data from BigQuery
 def query_latest_data(client, project_id, dataset_id, table_id):
