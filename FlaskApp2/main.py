@@ -4,6 +4,7 @@ from openai_utils import generate_weather_advice
 from weather import get_weather, get_daily_forecast, weather_icons
 from google_cloud_utils import insert_data_to_bigquery, query_latest_weather, query_latest_data
 from config import OPENWEATHER_API_KEY, YOUR_HASH_PASSWD, GCP_PROJECT_ID
+from PIL import Image
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
@@ -25,7 +26,7 @@ def index():
 @app.route('/generate_advice_audio', methods=['POST'])
 def generate_advice_audio():
     weather_data = request.get_json(force=True)
-    temperature = weather_data.get('outdoor_temp')
+    temperature = round(weather_data.get('outdoor_temp'))
     description = weather_data.get('outdoor_weather').lower()
 
     # Generate the base message with current weather description and temperature
@@ -142,7 +143,8 @@ def historical_data_graph():
     # Save the plot to a temporary file and read it into memory
     with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
         plt.savefig(tmpfile.name)
-        tmpfile.seek(0)
+        plot_data = Image.open(tmpfile.name).resize((320, 240), Image.LANCZOS)  # Resize to fit M5Stack Core2 screen
+        plot_data.save(tmpfile.name, format='PNG')
         plot_data = tmpfile.read()
     
     plt.close()

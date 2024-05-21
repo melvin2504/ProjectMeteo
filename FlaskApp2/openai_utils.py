@@ -17,7 +17,7 @@ def generate_weather_advice(outdoor_temp, outdoor_weather):
             {"role": "user", "content": prompt}
         ],
         model="gpt-3.5-turbo",
-        max_tokens=100,
+        max_tokens=90,
         temperature=0.7
     )
 

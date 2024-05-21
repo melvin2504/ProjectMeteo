@@ -1,10 +1,38 @@
 from m5stack import *
 from m5stack_ui import *
 from uiflow import *
+import gc
 import time
 import unit
 import urequests
 import network
+
+# Configuration Section
+# Wi-Fi credentials (list of tuples)
+wifi_credentials = [
+    ("Galaxy S20 FE 5GDEE0", "........"),
+    ("iot-unil", "4u6uch4hpY9pJ2f9")
+]
+
+# Google Cloud Endpoints
+OUTDOOR_WEATHER_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+GENERATE_ADVICE_AUDIO_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/generate_advice_audio'
+GET_DAILY_FORECAST_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/get_daily_forecast'
+HISTORICAL_DATA_GRAPH_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/historical_data_graph'
+SEND_TO_BIGQUERY_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/send-to-bigquery'
+
+# Password hash (example hash)
+passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
+
+# Constants for Wi-Fi connection attempts
+MAX_RETRIES = 5
+DELAY = 2  # Delay between attempts in seconds
+
+# Define thresholds for alerts
+LOW_HUMIDITY_THRESHOLD = 30  # Low humidity threshold (30%)
+HIGH_HUMIDITY_THRESHOLD = 70  # High humidity threshold (70%)
+POOR_AIR_QUALITY_THRESHOLD = 1000  # Poor air quality threshold (1000 ppb TVOC)
+ELEVATED_ECO2_THRESHOLD = 1000  # Elevated eCO2 threshold (1000 ppm)
 
 # Initialize the screen and units
 screen = M5Screen()
@@ -13,20 +41,6 @@ screen.set_screen_bg_color(0xd5d5d5)
 env3_0 = unit.get(unit.ENV3, unit.PORTA)
 motion_sensor = unit.get(unit.PIR, unit.PORTB)
 tvoc0 = unit.get(unit.TVOC, unit.PORTC)
-
-# Wi-Fi credentials (default)
-SSID1 = "Galaxy S20 FE 5GDEE0"
-PASSWORD1 = "........"
-SSID2 = "Galaxy S20 FE 5GDEE0"
-PASSWORD2 = "........"
-
-# Global variable to hold the selected SSID and password
-selected_ssid = SSID1
-selected_password = PASSWORD1
-
-# Constants for Wi-Fi connection attempts
-MAX_RETRIES = 3
-DELAY = 10  # Delay between attempts in seconds
 
 # Global variables for connection state and UI initialization
 wifi_connecting = False
@@ -37,32 +51,27 @@ next_connection_attempt = 0
 
 # Initialize variables and constants
 temp_flag = 300
-last_motion_time = 0
+last_motion_time = 300
 motion_cooldown = 300  # 5 minutes in seconds
 outdoor_weather_flag = 600  # Fetch outdoor weather every 10 minutes
-
-# Define thresholds for alerts
-LOW_HUMIDITY_THRESHOLD = 30  # Low humidity threshold (30%)
-HIGH_HUMIDITY_THRESHOLD = 70  # High humidity threshold (70%)
-POOR_AIR_QUALITY_THRESHOLD = 1000  # Poor air quality threshold (1000 ppb TVOC)
-ELEVATED_ECO2_THRESHOLD = 1000  # Elevated eCO2 threshold (1000 ppm)
 
 # Initialize labels
 alert_message = None
 
-# Password hash (example hash)
-passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
+# Define states
+STATE_MAIN_SCREEN = 0
+STATE_GRAPH = 1
+current_state = STATE_MAIN_SCREEN
 
-# Set up the RTC to sync time via NTP
-rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
+# Global variable to keep track of the graph image
+graph = None
 
 # Function to check for motion and fetch advice if motion is detected
 def check_motion():
     global last_motion_time
-    current_time = time.time()
-    if (motion_sensor.state == 1 and (current_time - last_motion_time > motion_cooldown)) or btnA.isPressed():
+    if (motion_sensor.state == 1 and (last_motion_time >= motion_cooldown)) or btnA.isPressed():
         fetch_and_play_advice()
-        last_motion_time = current_time  # Update the last motion time
+        last_motion_time = 0  # Update the last motion time
 
 # Function to update air quality and check for alerts
 def update_air_quality():
@@ -97,9 +106,8 @@ def get_datetime_strings():
 
 # Function to fetch outdoor weather data
 def fetch_outdoor_weather():
-    url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/get_outdoor_weather'
     headers = {'Content-Type': 'application/json'}
-    response = urequests.post(url, json={"passwd": passwd_hash}, headers=headers)
+    response = urequests.post(OUTDOOR_WEATHER_URL, json={"passwd": passwd_hash}, headers=headers)
     if response.status_code == 200:
         return response.json()
     else:
@@ -110,9 +118,8 @@ def fetch_outdoor_weather():
 def fetch_and_play_advice():
     outdoor_weather = fetch_outdoor_weather()
     if outdoor_weather:
-        url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/generate_advice_audio'
         headers = {'Content-Type': 'application/json'}
-        response = urequests.post(url, json=outdoor_weather, headers=headers)
+        response = urequests.post(GENERATE_ADVICE_AUDIO_URL, json=outdoor_weather, headers=headers)
         if response.status_code == 200:
             with open('res/advice.wav', 'wb') as f:
                 f.write(response.content)
@@ -122,9 +129,8 @@ def fetch_and_play_advice():
 
 # Function to fetch forecast data
 def fetch_forecast():
-    url = 'https://flaskapp4-vukguwbvha-oa.a.run.app/get_daily_forecast'
     headers = {'Content-Type': 'application/json'}
-    response = urequests.post(url, json={"passwd": passwd_hash, "city": {"lat": 46.5196535, "lon": 6.6322734}}, headers=headers)  # Lausanne
+    response = urequests.post(GET_DAILY_FORECAST_URL, json={"passwd": passwd_hash, "city": {"lat": 46.5196535, "lon": 6.6322734}}, headers=headers)  # Lausanne
     if response.status_code == 200:
         return response.json()
     else:
@@ -176,10 +182,28 @@ def update_forecast_display():
         no_data_label = M5Label("No forecast data available", x=20, y=30, color=0x000, font=FONT_MONT_10, parent=None)
         forecast_ui_elements.append(no_data_label)
 
+# Function to fetch and display graph
+def fetch_and_display_graph():
+    global graph
+    headers = {'Content-Type': 'application/json'}
+    graph_file_path = '/flash/graph.png'
+
+    response = urequests.post(HISTORICAL_DATA_GRAPH_URL, json={"passwd": passwd_hash}, headers=headers)
+    if response.status_code == 200:
+        with open(graph_file_path, 'wb') as f:
+            f.write(response.content)
+        # Display the graph image
+        graph = M5Img(graph_file_path, x=0, y=0)
+    else:
+        alert_message.set_text("Failed to fetch graph image: " + str(response.status_code))
+
+    response.close()
 
 # Function to initialize the main screen UI
 def init_main_screen():
     screen.clean_screen()
+    gc.collect()
+    free_heap = gc.mem_free()
     global state, ui_initialized
     ui_initialized = True
     # Re-create the main screen UI elements
@@ -205,33 +229,33 @@ def init_main_screen():
     tvoc_label = M5Label('TVOC: 0 ppb', x=230, y=166, color=0x000, font=FONT_MONT_10, parent=None)
     eco2_label = M5Label('eCO2: 0 ppm', x=230, y=186, color=0x000, font=FONT_MONT_10, parent=None)
     
-    alert_message = M5Label('', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
+    alert_message = M5Label(' Hello !', x=200, y=213, color=0xff0000, font=FONT_MONT_10, parent=None)
     
-    update_forecast_display()
+    # Set up the RTC to sync time via NTP
+    rtc.settime('ntp', host='ch.pool.ntp.org', tzone=2)  # Adjust the time zone parameter as needed
 
-# Function to connect to Wi-Fi with retry logic in non-blocking manner
-def connect_wifi_non_blocking():
-    global wifi_connecting, connection_attempts, alert_message, next_connection_attempt
-    current_time = time.ticks_ms()
-    if current_time >= next_connection_attempt:
-        wlan = network.WLAN(network.STA_IF)
-        wlan.active(True)
-        if not wlan.isconnected() and connection_attempts < MAX_RETRIES:
-            if alert_message is None:
-                alert_message = M5Label('Connecting... Attempt {}'.format(connection_attempts + 1), x=20, y=50, color=0x000, font=FONT_MONT_18, parent=None)
-            else:
-                alert_message.set_text('Connecting... Attempt {}'.format(connection_attempts + 1))
-            wlan.connect(selected_ssid, selected_password)
-            connection_attempts += 1
-            wifi_connecting = True
-        elif wlan.isconnected():
-            if alert_message is not None:
-                alert_message.set_text('Connected!')
-            wifi_connecting = False
-            connection_attempts = 0  # Reset connection attempts
-        else:
-            if alert_message is not None:
-                alert_message.set_text('Connection failed after {} attempts.'.format(MAX_RETRIES))
+def connect_wifi():
+    """Connects to WiFi with retry logic."""
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+
+    # Create a label for connection status
+    connection_label = M5Label('', x=19, y=42, color=0xff0000, font=FONT_MONT_10, parent=None)
+
+    for ssid, password in wifi_credentials:
+        attempts = 0
+        while not wlan.isconnected() and attempts < MAX_RETRIES:
+            connection_label.set_text('Connecting to {}... Attempt {}'.format(ssid, attempts + 1))
+            wlan.connect(ssid, password)
+            time.sleep(DELAY)
+            attempts += 1
+
+        if wlan.isconnected():
+            connection_label.set_text('')
+            return True
+
+    connection_label.set_text('Connection failed after {} attempts.'.format(MAX_RETRIES * len(wifi_credentials)))
+    return False
 
 # Function to check Wi-Fi connection and reconnect if necessary
 def check_wifi_connection():
@@ -244,21 +268,21 @@ def check_wifi_connection():
 wifi_retry = True
 
 while True:
-    # Initialize the main UI if not already initialized
-    if not ui_initialized:
-        init_main_screen()
-    
     if wifi_retry:
-        connect_wifi_non_blocking()
+        connect_wifi()
         wifi_retry = False
     
     if wifi_connecting:
-        connect_wifi_non_blocking()
+        connect_wifi()
     
     check_wifi_connection()  # Check Wi-Fi connection periodically
 
     if not wifi_connecting and wifi_retry:
-        connect_wifi_non_blocking()
+        connect_wifi()
+        
+    # Initialize the main UI if not already initialized
+    if not ui_initialized:
+        init_main_screen()
     
     # Update date and time labels
     date_string, time_string = get_datetime_strings()
@@ -285,7 +309,6 @@ while True:
     
     # Send data to BigQuery every 5 minutes
     if temp_flag >= 300:
-        date_string, time_string = get_datetime_strings()
         data = {
             "passwd": passwd_hash,
             "values": {
@@ -297,13 +320,27 @@ while True:
                 "indoor_eco2": tvoc0.eCO2
             }
         }
-        urequests.post("https://flaskapp4-vukguwbvha-oa.a.run.app/send-to-bigquery", json=data)
+        urequests.post(SEND_TO_BIGQUERY_URL, json=data)
         temp_flag = 0  # Reset the counter
     
     temp_flag += 1
-
+    
     # Check for motion and fetch advice if necessary
     check_motion()
+    last_motion_time += 1
+    free_heap = gc.mem_free()
+        
+    if current_state == STATE_MAIN_SCREEN:
+        # Check for button presses to switch to the graph state
+        if btnB.isPressed():
+            current_state = STATE_GRAPH
+            fetch_and_display_graph()
+        # Additional main screen logic
+    elif current_state == STATE_GRAPH:
+        # Check for button presses to switch back to the main screen
+        if btnC.isPressed():
+            current_state = STATE_MAIN_SCREEN
+            graph.set_hidden(True)
+        # Additional graph display logic
 
-    # Wait for one second before the next iteration
     wait_ms(1000)

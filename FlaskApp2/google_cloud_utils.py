@@ -4,15 +4,20 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 def insert_data_to_bigquery(client, data):
-    """Inserts weather data into BigQuery."""
+        # Prepare the query to insert data into BigQuery
     fields = ', '.join(data.keys())
     values = ', '.join([f"'{v}'" if isinstance(v, str) else str(v) for v in data.values()])
+    
     query = f"""
     INSERT INTO `lab-test-1-415115.weather_IoT_data.weather-records` ({fields})
     VALUES ({values})
     """
-    query_job = client.query(query)
-    query_job.result()  # Wait for the query job to complete
+    try:
+        query_job = client.query(query)
+        query_job.result()  # Wait for the query job to complete
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Function to query the latest data from BigQuery
 def query_latest_data(client, project_id, dataset_id, table_id):
@@ -24,8 +29,6 @@ def query_latest_data(client, project_id, dataset_id, table_id):
     """
     query_job = client.query(query)
     df = query_job.to_dataframe()
-    now = datetime.now()
-    six_hours_ago = now - timedelta(hours=6)
     
     # Convert the date column to string and time column to string in the desired format before concatenation
     df['date'] = df['date'].astype(str)
@@ -35,8 +38,8 @@ def query_latest_data(client, project_id, dataset_id, table_id):
     # Sort DataFrame by datetime
     df = df.sort_values(by='datetime')
     
-    filtered_df = df[df['datetime'] >= six_hours_ago]
-    return filtered_df
+
+    return df
 
 def query_latest_weather(client):
     """Fetches the latest weather data from BigQuery."""
