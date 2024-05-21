@@ -34,6 +34,18 @@ def fetch_outdoor_weather(password):
         st.error("Failed to fetch outdoor weather data")
         return None
     
+def fetch_latest_indoor():
+    url = 'http://127.0.0.1:8080/get-latest-indoor'  # Endpoint URL
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+    except requests.exceptions.RequestException as e:
+        st.error('Failed to fetch latest indoor data: {}'.format(e))
+        return None
+
 def fetch_daily_forecast(city_lat, city_lon, password):
     url = 'http://127.0.0.1:8080/get_daily_forecast'  # Adjust the URL if Flask is running on a different host or port
     headers = {'Content-Type': 'application/json'}
@@ -447,8 +459,7 @@ def display_outdoor_weather(weather_data):
             else:
                 st.error(f"Humidity icon file {humidity_icon_path} not found.")
             st.write(f"{weather_data['outdoor_humidity']} %")
-
-            
+        
 def display_forecast(forecast_data):
     # Using columns in Streamlit to display each piece of data
     cols = st.columns(len(forecast_data))
@@ -462,6 +473,21 @@ def display_forecast(forecast_data):
             image = Image.open(icon_path)
             st.image(image)  # Adjust the width as necessary
             st.write(temp)
+
+def display_indoor_data(indoor_data):
+    if indoor_data:
+        st.write("### Current Indoor Data")
+
+        cols = st.columns(4)
+
+        with cols[0]:
+            st.metric("Indoor Temperature", f"{indoor_data['indoor_temp']} °C")
+        with cols[1]:
+            st.metric("Indoor Humidity", f"{indoor_data['indoor_humidity']} %")
+        with cols[2]:
+            st.metric("Indoor TVOC", f"{indoor_data['indoor_tvoc']} ppb")
+        with cols[3]:
+            st.metric("Indoor eCO2", f"{indoor_data['indoor_eco2']} ppm")
 
 def main():
     st.sidebar.title("Navigation")
@@ -478,6 +504,9 @@ def main():
         outdoor_weather = fetch_outdoor_weather(YOUR_HASH_PASSWD)
         if outdoor_weather:
             display_outdoor_weather(outdoor_weather)
+        indoor_data = fetch_latest_indoor()
+        if indoor_data:
+            display_indoor_data(indoor_data)
 
     elif page == "Graphics":
         st.title("Weather Graphics")

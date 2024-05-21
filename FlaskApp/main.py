@@ -127,27 +127,29 @@ def fetch_hourly_max_for_last_7_days():
 def index():
     return "Welcome to the Weather App!"
 
-@app.route('/get-latest-temperature', methods=['GET'])
-def get_latest_temperature():
-
+@app.route('/get-latest-indoor', methods=['GET'])
+def get_latest_indoor():
     query = """
-    SELECT outdoor_temp
+    SELECT indoor_temp, indoor_humidity, indoor_tvoc, indoor_eco2
     FROM `lab-test-1-415115.weather_IoT_data.weather-records`
     ORDER BY time DESC
     LIMIT 1
     """
     try:
-        # Execute the query
         query_job = client.query(query)
-        results = query_job.result()  # Waits for the job to complete.
+        results = query_job.result()  # Wait for the job to complete.
 
-        # Fetch the temperature
         for row in results:
-            temperature = row.outdoor_temp
-            return jsonify({"temperature": temperature})
-
+            indoor_data = {
+                "indoor_temp": row.indoor_temp,
+                "indoor_humidity": row.indoor_humidity,
+                "indoor_tvoc": row.indoor_tvoc,
+                "indoor_eco2": row.indoor_eco2
+            }
+            return jsonify(indoor_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
     
 @app.route('/hourly-max', methods=['POST'])
 def get_hourly_max():
