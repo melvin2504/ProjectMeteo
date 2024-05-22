@@ -28,9 +28,9 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 ## Hardware and Software Requirements
 - **Hardware:**
   - **M5stack Core2 IoT Device:** A versatile and stackable IoT development kit. For more information and specifications, see the [M5stack Core2 documentation](https://docs.m5stack.com/en/core/core2).
-  - **ENVIII Sensor (Humidity & Temperature):** Measures indoor humidity and temperature. Detailed documentation can be found [here]([https://docs.m5stack.com/en/unit/envIII](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988)).
-  - **Air Quality Sensor:** Monitors indoor air quality. Further details are available in the [sensor documentation]([https://docs.m5stack.com/en/unit/gas](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30)).
-  - **Motion Sensor:** Detects movement to trigger alerts or actions. Learn more from the [sensor's manual]([https://docs.m5stack.com/en/unit/pir](https://shop.m5stack.com/products/pir-module)).
+  - **ENVIII Sensor (Humidity & Temperature):** Measures indoor humidity and temperature. Detailed documentation can be found [here](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988).
+  - **Air Quality Sensor:** Monitors indoor air quality. Further details are available in the [sensor documentation](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30).
+  - **Motion Sensor:** Detects movement to trigger alerts or actions. Learn more from the [sensor's manual](https://shop.m5stack.com/products/pir-module).
 
 - **Software:**
   - Google Cloud Platform account
