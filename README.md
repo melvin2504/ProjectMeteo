@@ -31,7 +31,8 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
   - **ENVIII Sensor (Humidity & Temperature):** Measures indoor humidity and temperature. Detailed documentation can be found [here](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988).
   - **Air Quality Sensor:** Monitors indoor air quality. Further details are available in [here](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30).
   - **Motion Sensor:** Detects movement to trigger alerts or actions. Learn more [here](https://shop.m5stack.com/products/pir-module).
-<b>
+
+<br>
 <div align="center">
   <img src="https://shop.m5stack.com/cdn/shop/products/1_3f420584-fb2f-48c3-bd01-17f083de0880_1200x1200.jpg?v=1608513603" alt="Core2" width="200"/>
   <img src="https://shop.m5stack.com/cdn/shop/products/1_c0de294c-761b-45d0-9098-fe75effe7f49_1200x1200.jpg?v=1627863922" alt="Motion Sensor" width="200"/>
