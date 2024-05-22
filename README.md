@@ -23,7 +23,7 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 - **Cloud Integration:** Data storage and retrieval using Google BigQuery.
 - **Alerts and Notifications:** Text-to-speech announcements for wheather conditions and notifications on the screen when air quality is bad
 - **User Interfaces:** Local interface on the M5stack device and a cloud-based dashboard.
-- **Historical Data Visualization:** Access and analyze past weather data on the Streamlit dashboard.
+- **Historical Data Visualization:** Access and analyze past weather data on the Streamlit dashboard and on the M5Stack in a more simplistic way.
 
 ## Hardware and Software Requirements
 - **Hardware:**
