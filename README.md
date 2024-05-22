@@ -67,7 +67,7 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 
 ### 3. Device Configuration
 1. Connect the M5stack Core2 to [M5Flow](https://flow.m5stack.com/) and connect the sensors.
-2. Take the micropython code, change the wifi credentials and the endpoints for your deployed service.
+2. Take the Micropython code from [here], change the wifi credentials and the endpoints for your deployed service.
 4. Upload the relevant code (mettre lien vers git) to the device, ensuring it can retrieve data from BigQuery on startup.
 
 ## Project Structure
