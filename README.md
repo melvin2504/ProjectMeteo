@@ -35,6 +35,7 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 - **Software:**
   - Google Cloud Platform account
   - OpenWeatherMap API key
+  - OpenAi API key for advice generation
   - Python 3.8+
   - Required Python packages (see `requirements.txt`)
 
