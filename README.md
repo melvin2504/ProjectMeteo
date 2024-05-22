@@ -52,7 +52,7 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 
 ### 1. Google Cloud Setup
 1. Create a Google Cloud project and enable the BigQuery and Text-to-Speech APIs.
-2. Set up a BigQuery dataset and table for storing sensor data.
+2. Set up a BigQuery dataset and table for storing sensor and outdoor data.
 3. Obtain the necessary credentials and save them as `google_credentials.json`.
 
 ### 2. Local Deployment
