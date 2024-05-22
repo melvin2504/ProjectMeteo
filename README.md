@@ -75,4 +75,4 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 - Laurent Sierro (GitHub: @Aztol) - Cloud dashboard and Google Cloud integration.
 
 ## Video Demonstration
-- Check out our YouTube video demonstration to see the project in action !
+- Check out our [YouTube video demonstration](https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUJcmljayByb2xs) to see the project in action !
