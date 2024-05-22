@@ -39,6 +39,7 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
   <img src="https://shop.m5stack.com/cdn/shop/products/1_d5b646cb-fed3-4644-a881-937971cd87c3_1200x1200.jpg?v=1676450541" alt="Motion Sensor" width="200"/>
 </div>
 <br>
+
 - **Software:**
   - Google Cloud Platform account
   - OpenWeatherMap API key
