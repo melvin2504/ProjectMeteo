@@ -31,10 +31,10 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
   - **ENVIII Sensor (Humidity & Temperature):** Measures indoor humidity and temperature. Detailed documentation can be found [here](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988).
   - **Air Quality Sensor:** Monitors indoor air quality. Further details are available in [here](https://shop.m5stack.com/products/tvoc-eco2-gas-unit-sgp30).
   - **Motion Sensor:** Detects movement to trigger alerts or actions. Learn more [here](https://shop.m5stack.com/products/pir-module).
-
-  <img src="https://shop.m5stack.com/cdn/shop/products/1_c0de294c-761b-45d0-9098-fe75effe7f49_1200x1200.jpg?v=1627863922" alt="Motion Sensor" width="200"/>
-  <img src="https://shop.m5stack.com/cdn/shop/products/1_396ff532-f0ac-4eee-b102-cbc9afdd97c9_1200x1200.jpg?v=1598833693" alt="Air Sensor" width="200"/>
-  <img src="https://shop.m5stack.com/cdn/shop/products/1_d5b646cb-fed3-4644-a881-937971cd87c3_1200x1200.jpg?v=1676450541" alt="Motion Sensor" width="200"/>
+<b>
+<img src="https://shop.m5stack.com/cdn/shop/products/1_c0de294c-761b-45d0-9098-fe75effe7f49_1200x1200.jpg?v=1627863922" alt="Motion Sensor" width="200"/>
+<img src="https://shop.m5stack.com/cdn/shop/products/1_396ff532-f0ac-4eee-b102-cbc9afdd97c9_1200x1200.jpg?v=1598833693" alt="Air Sensor" width="200"/>
+<img src="https://shop.m5stack.com/cdn/shop/products/1_d5b646cb-fed3-4644-a881-937971cd87c3_1200x1200.jpg?v=1676450541" alt="Motion Sensor" width="200"/>
 
 - **Software:**
   - Google Cloud Platform account
