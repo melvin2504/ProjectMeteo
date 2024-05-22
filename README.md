@@ -51,3 +51,28 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
    ```sh
    git clone https://github.com/yourusername/weather-monitor.git
    cd weather-monitor
+2. Install the required Python packages:
+   ```sh
+   pip install -r requirements.txt
+3. Set up environment variables for Google Cloud and OpenWeatherMap in config.py.
+
+### 3. Device Configuration
+1. Flash the M5stack Core2 with the provided firmware and connect the sensors.
+2. Ensure the device can connect to your local Wi-Fi network.
+3. Upload the relevant code (mettre lien vers git) to the device, ensuring it can retrieve data from BigQuery on startup.
+
+## Project Structure
+- **main.py**: Entry point for the Flask application.
+- **config.py**: Configuration file for API keys and other settings.
+- **google_cloud_utils.py**: Functions for interacting with Google Cloud services.
+- **openai_utils.py**: Functions for interacting with OpenAI services.
+- **weather.py**: Functions for fetching and processing weather data.
+- **requirements.txt**: List of required Python packages.
+- **Dockerfile**: Instructions for building a Docker image of the application.
+
+## Contributors
+- Melvin Petracca (GitHub: @melvin2504) - Indoor monitoring and device interface.
+- Laurent Sierro (GitHub: @Aztol) - Cloud dashboard and Google Cloud integration.
+
+## Video Demonstration
+- Check out our YouTube video demonstration to see the project in action !
