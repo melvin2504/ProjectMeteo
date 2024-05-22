@@ -27,10 +27,10 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 
 ## Hardware and Software Requirements
 - **Hardware:**
-  - M5stack Core2 IoT device
-  - ENVIII sensor (humidity & temperature)
-  - Air quality sensor
-  - Motion sensor
+- **M5stack Core2 IoT Device:** A versatile and stackable IoT development kit. For more information and specifications, see the [M5stack Core2 documentation](https://docs.m5stack.com/en/core/core2).
+- **ENVIII Sensor (Humidity & Temperature):** Measures indoor humidity and temperature. Detailed documentation can be found [here](https://docs.m5stack.com/en/unit/envIII).
+- **Air Quality Sensor:** Monitors indoor air quality. Further details are available in the [sensor documentation](https://docs.m5stack.com/en/unit/gas).
+- **Motion Sensor:** Detects movement to trigger alerts or actions. Learn more from the [sensor's manual](https://docs.m5stack.com/en/unit/pir).
 
 - **Software:**
   - Google Cloud Platform account
