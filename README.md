@@ -57,9 +57,9 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 3. Set up environment variables for Google Cloud and OpenWeatherMap in config.py.
 
 ### 3. Device Configuration
-1. Flash the M5stack Core2 with the provided firmware and connect the sensors.
-2. Ensure the device can connect to your local Wi-Fi network.
-3. Upload the relevant code (mettre lien vers git) to the device, ensuring it can retrieve data from BigQuery on startup.
+1. Connect the M5stack Core2 to [M5Flow](https://flow.m5stack.com/) and connect the sensors.
+2. Take the micropython code, change the wifi credentials and the endpoints of for your deployed service.
+4. Upload the relevant code (mettre lien vers git) to the device, ensuring it can retrieve data from BigQuery on startup.
 
 ## Project Structure
 - **main.py**: Entry point for the Flask application.
