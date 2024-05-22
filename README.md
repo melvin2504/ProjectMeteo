@@ -49,8 +49,8 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 ### 2. Local Deployment
 1. Clone this repository:
    ```sh
-   git clone https://github.com/yourusername/weather-monitor.git
-   cd weather-monitor
+   git clone https://github.com/melvin2504/ProjectMeteo.git
+   cd FlaskApp
 2. Install the required Python packages:
    ```sh
    pip install -r requirements.txt
