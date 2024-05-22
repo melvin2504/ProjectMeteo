@@ -1,6 +1,6 @@
 # Indoor/Outdoor Weather Monitor with M5stack IoT Device and Cloud Dashboard
 
-Welcome to our project repository! This project involves implementing an indoor/outdoor weather monitor using M5stack IoT devices and sensors, integrated with a web dashboard deployed on the cloud. This solution provides real-time weather monitoring and forecasting, along with historical data visualization, all managed through Google Cloud services.
+Welcome to our project repository ! This project involves implementing an indoor/outdoor weather monitor using M5stack IoT devices and sensors, integrated with a web dashboard deployed on the cloud. This solution provides real-time weather monitoring and forecasting, along with historical data visualization, all managed through Google Cloud services.
 
 ## Table of Contents
 - [Project Overview](#project-overview)
