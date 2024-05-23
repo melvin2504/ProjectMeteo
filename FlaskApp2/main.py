@@ -127,39 +127,6 @@ def get_latest_indoor():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/get_outdoor_weather', methods=['POST'])
-def get_outdoor_weather():
-    # Verify password from the request
-    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
-        return jsonify({"error": "Incorrect Password!"}), 401
-    
-    # Query to select the latest outdoor temperature, humidity, and description records
-    query = """
-    SELECT outdoor_temp, outdoor_humidity, outdoor_weather
-    FROM lab-test-1-415115.weather_IoT_data.weather-records
-    ORDER BY date desc, time desc limit 1
-    """
-    try:
-        query_job = client.query(query)  # Execute the query
-        results = query_job.result()  # Wait for results
-
-
-
-        # Extract data from query results
-        row = next(iter(results), None)  # Get the first result if available
-        if row:
-            icon_code = weather_icons.get(row.outdoor_weather, '01d')  # Get icon code, use 'default' if not found
-            return jsonify({
-                "outdoor_temp": row.outdoor_temp,
-                "outdoor_humidity": row.outdoor_humidity,
-                "outdoor_weather": row.outdoor_weather,
-                "icon_code": icon_code  # Include the icon code in the response
-            })
-        else:
-            return jsonify({"error": "No data available"}), 404
-    except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-
 @app.route('/get-min-avg-max', methods=['POST'])
 def get_temperature_stats():
     if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
