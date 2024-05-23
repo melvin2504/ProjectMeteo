@@ -50,7 +50,7 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 
 ## 📦 Setup and Deployment Instructions
 
-### 🚀 Google Cloud Deployment Instructions
+### 🌍 Google Cloud Deployment Instructions
 
 Deploying the application on Google Cloud allows you to utilize powerful cloud-based services for handling data processing, storage, and web hosting. Follow these detailed steps to get your application running on Google Cloud.
 
@@ -105,7 +105,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
 
 By following these steps, you'll have a robust deployment of your weather monitoring application running on Google Cloud, leveraging its powerful services for scalability and performance.
 
-### 2. Local Deployment
+### 💻 Local Deployment
 1. Clone this repository:
    ```sh
    git clone https://github.com/melvin2504/ProjectMeteo.git
@@ -115,7 +115,7 @@ By following these steps, you'll have a robust deployment of your weather monito
    pip install -r requirements.txt
 3. Set up environment variables for Google Cloud and OpenWeatherMap in config.py.
 
-### 3. Device Configuration
+### 📱 Device Configuration
 1. Connect the M5stack Core2 to [M5Flow](https://flow.m5stack.com/) and connect the sensors.
 2. Customize the Micropython (`display.py`), change the Wi-Fi credentials, and the endpoints for your deployed service.
 4. Upload the relevant code from M5Flow to the device.
