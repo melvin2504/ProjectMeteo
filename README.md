@@ -4,16 +4,16 @@ Welcome to our project repository! This project involves implementing an indoor/
 
 ## 📑 Table of Contents
 - [Project Overview](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-project-overview)
-- [Exciting Features](#exciting-features)
-- [Hardware and Software Requirements](#hardware-and-software-requirements)
-- [Setup and Deployment Instructions](#setup-and-deployment-instructions)
-  - [Google Cloud Deployment Instructions](#google-cloud-deployment-instructions)
-  - [Local Deployment](#local-deployment)
-  - [Device Configuration](#device-configuration)
-- [Project Structure](#project-structure)
-- [3D Printing Your M5Stack Core2 Holder](#3d-printing-your-m5stack-core2-holder)
-- [Contributors](#contributors)
-- [Video Demonstration](#video-demonstration)
+- [Exciting Features](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-exciting-features)
+- [Hardware and Software Requirements](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-hardware-and-software-requirements)
+- [Setup and Deployment Instructions](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-setup-and-deployment-instructions)
+  - [Google Cloud Deployment Instructions](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-google-cloud-deployment-instructions)
+  - [Local Deployment](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-local-deployment)
+  - [Device Configuration](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-device-configuration)
+- [Project Structure](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-project-structure)
+- [3D Printing Your M5Stack Core2 Holder](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-3d-printing-your-m5stack-core2-holder)
+- [Contributors](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-contributors)
+- [Video Demonstration](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-video-demonstration)
 
 ## 🚀 Project Overview
 This project utilizes the M5stack Core2 IoT device along with various sensors to monitor both indoor and outdoor weather conditions. The data is displayed on the device interface and a cloud-based dashboard built with Streamlit. All data is stored in Google Cloud's BigQuery, allowing for both real-time and historical data analysis.
