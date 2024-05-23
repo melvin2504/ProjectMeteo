@@ -3,7 +3,7 @@
 Welcome to our project repository! This project involves implementing an indoor/outdoor weather monitor using M5stack IoT devices and sensors, integrated with a web dashboard deployed on the cloud. This solution provides real-time weather monitoring and forecasting, along with historical data visualization, all managed through Google Cloud services.
 
 ## 📑 Table of Contents
-- [Project Overview](#project-overview)
+- [Project Overview](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-project-overview)
 - [Exciting Features](#exciting-features)
 - [Hardware and Software Requirements](#hardware-and-software-requirements)
 - [Setup and Deployment Instructions](#setup-and-deployment-instructions)
