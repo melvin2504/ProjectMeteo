@@ -130,7 +130,13 @@ By following these steps, you'll have a robust deployment of your weather monito
 - **Dockerfile**: Instructions for building a Docker image of the application.
 
 ## 🖨️ 3D Printing Your M5Stack Core2 Holder
-<img src="images/standside.jpg" alt="Core2holder" width="300"/>
+
+<div align="center">
+  <img src="images/standfront.jpg" alt="Core2holder" width="300"/>
+  <img src="images/standback.jpg" alt="Core2holder" width="300"/>
+  <img src="images/standside.jpg" alt="Core2holder" width="300"/>
+</div>
+
 To enhance your experience with the M5Stack Core2, you have the option to print a custom 3D holder. This stand not only secures your device but also positions it for optimal interaction and visibility.
 
 ### Get the 3D Model
