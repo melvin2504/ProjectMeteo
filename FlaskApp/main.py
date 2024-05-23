@@ -5,6 +5,7 @@ from google.cloud import texttospeech
 import requests
 from datetime import datetime
 from openai import OpenAI
+import pandas as pd
 
 # You only need to uncomment the line below if you want to run your flask app locally.
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./lab-test-1-415115-c2f0b755d8b4.json"
@@ -122,6 +123,36 @@ def fetch_hourly_max_for_last_7_days():
         })
     return hourly_data
 
+def fetch_min_avg_max():
+    query = """
+    SELECT
+      TIMESTAMP(DATETIME(date, time)) AS datetime,
+      indoor_temp
+    FROM
+      `lab-test-1-415115.weather_IoT_data.weather-records`
+    WHERE
+      date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+    ORDER BY
+      datetime
+    """
+    query_job = client.query(query)
+    df = query_job.to_dataframe()
+
+    # Ensure datetime is in the correct format and set as index
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df.set_index('datetime', inplace=True)
+
+    # Resample the dataframe to 3-hour bins and calculate max, min, and mean temperatures
+    resampled_df = df['indoor_temp'].resample('3H').agg(['max', 'min', 'mean']).fillna(0)
+
+    # Format the result as a dictionary
+    result = {
+        'datetime': resampled_df.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+        'max_temp': resampled_df['max'].tolist(),
+        'min_temp': resampled_df['min'].tolist(),
+        'avg_temp': resampled_df['mean'].tolist(),
+    }
+    return result
 
 @app.route('/')
 def index():
@@ -272,6 +303,13 @@ def get_outdoor_weather():
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
     
+@app.route('/get-min-avg-max', methods=['POST'])
+def get_temperature_stats():
+    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
+    data = fetch_min_avg_max()
+    return jsonify(data)
+
 @app.route('/get_daily_forecast', methods=['POST'])
 def daily_forecast():
     # Authenticate the request

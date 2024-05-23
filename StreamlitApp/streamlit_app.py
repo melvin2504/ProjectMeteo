@@ -34,10 +34,10 @@ def fetch_outdoor_weather(password):
         st.error("Failed to fetch outdoor weather data")
         return None
     
-def fetch_latest_indoor():
+def fetch_latest_indoor(password):
     url = 'http://127.0.0.1:8080/get-latest-indoor'  # Endpoint URL
     try:
-        response = requests.get(url)
+        response = requests.get(url, json={"password": password})
         if response.status_code == 200:
             return response.json()
         else:
@@ -73,124 +73,21 @@ def fetch_hourly_max(password):
         st.error("Failed to fetch hourly max data")
         return None 
 
-def temp_gauge():
-    latest_temp = fetch_latest_temperature()
-    st.write(f"Latest temperature: {latest_temp} °C")
-    options = {
-        "series": [
-            {
-                "type": 'gauge',
-                "center": ['50%', '60%'],
-                "startAngle": 200,
-                "endAngle": -20,
-                "min": 0,
-                "max": 60,
-                "splitNumber": 12,
-                "itemStyle": {
-                    "color": '#FFAB91'
-                },
-                "progress": {
-                    "show": True,
-                    "width": 30
-                },
-                "pointer": {
-                    "show": False
-                },
-                "axisLine": {
-                    "lineStyle": {
-                        "width": 30
-                    }
-                },
-                "axisTick": {
-                    "distance": -45,
-                    "splitNumber": 5,
-                    "lineStyle": {
-                        "width": 2,
-                        "color": '#999'
-                    }
-                },
-                "splitLine": {
-                    "distance": -52,
-                    "length": 14,
-                    "lineStyle": {
-                        "width": 3,
-                        "color": '#999'
-                    }
-                },
-                "axisLabel": {
-                    "distance": -20,
-                    "color": '#999',
-                    "fontSize": 20
-                },
-                "anchor": {
-                    "show": False
-                },
-                "title": {
-                    "show": False
-                },
-                "detail": {
-                    "valueAnimation": True,
-                    "width": '60%',
-                    "lineHeight": 40,
-                    "borderRadius": 8,
-                    "offsetCenter": [0, '-15%'],
-                    "fontSize": 60,
-                    "fontWeight": 'bolder',
-                    "formatter": '{value} °C',
-                    "color": 'inherit'
-                },
-                "data": [
-                    {
-                        "value": 20
-                    }
-                ]
-            },
-            {
-                "type": 'gauge',
-                "center": ['50%', '60%'],
-                "startAngle": 200,
-                "endAngle": -20,
-                "min": 0,
-                "max": 60,
-                "itemStyle": {
-                    "color": '#FD7347'
-                },
-                "progress": {
-                    "show": True,
-                    "width": 8
-                },
-                "pointer": {
-                    "show": False
-                },
-                "axisLine": {
-                    "show": False
-                },
-                "axisTick": {
-                    "show": False
-                },
-                "splitLine": {
-                    "show": False
-                },
-                "axisLabel": {
-                    "show": False
-                },
-                "detail": {
-                    "show": False
-                },
-                "data": [
-                    {
-                        "value": 20
-                    }
-                ]
-            }
-        ]
-    }
+def fetch_min_avg_max(password):
+    url = 'http://127.0.0.1:8080/get-min-avg-max'
+    try:
+        response = requests.post(url, json={"password": password})
+        if response.status_code == 200:
+            return response.json()
+        else:
+            st.error('Failed to fetch temperature stats')
+            return None
+    except requests.exceptions.RequestException as e:
+        st.error(f'Error: {e}')
+        return None
 
 
-    
-    options["series"][0]["data"][0]["value"] = latest_temp
-    options["series"][1]["data"][0]["value"] = latest_temp
-    st_echarts(options=options, height="500px")
+   
 
 def render_basic_bar():
     option = {
@@ -214,7 +111,43 @@ def render_basic_bar():
 def round_time_to_nearest_hour(time):
     return (time + timedelta(minutes=30)).replace(minute=0, second=0, microsecond=0)
 
-#skkr samarche
+def plot_temperature_stats(data):
+    if data:
+        df = pd.DataFrame(data)
+        df['datetime'] = pd.to_datetime(df['datetime'])
+
+        # Set up dark mode style
+        plt.style.use('dark_background')
+        plt.rcParams.update({
+            'figure.facecolor': '#0e1117',
+            'axes.facecolor': '#0e1117',
+            'axes.edgecolor': 'white',
+            'axes.labelcolor': 'white',
+            'xtick.color': 'white',
+            'ytick.color': 'white',
+            'text.color': 'white',
+            'grid.color': 'gray',
+            'patch.edgecolor': 'white',
+            'legend.facecolor': '#0e1117',
+            'legend.edgecolor': 'white'
+        })
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+        fig.patch.set_facecolor('#0e1117')  # Set surrounding background color
+        ax.set_facecolor('#0e1117')  # Set background color of the plot area
+
+        ax.plot(df['datetime'], df['max_temp'], label='Max Temperature', color='#FF6347')  # Tomato
+        ax.plot(df['datetime'], df['avg_temp'], label='Average Temperature', color='#1E90FF')  # DodgerBlue
+        ax.plot(df['datetime'], df['min_temp'], label='Min Temperature', color='#32CD32')  # LimeGreen
+
+        ax.set_xlabel('Datetime', color='white')
+        ax.set_ylabel('Temperature (°C)', color='white')
+        ax.set_title('Temperature Stats (Max, Avg, Min) Every 3 Hours - Last 7 Days', color='white')
+        ax.legend()
+        ax.grid(True)
+        st.pyplot(fig)
+
+
 def render_heatmap_2(data):
     if data:
         # Convert the data into a DataFrame
@@ -504,16 +437,18 @@ def main():
         outdoor_weather = fetch_outdoor_weather(YOUR_HASH_PASSWD)
         if outdoor_weather:
             display_outdoor_weather(outdoor_weather)
-        indoor_data = fetch_latest_indoor()
+        indoor_data = fetch_latest_indoor(YOUR_HASH_PASSWD)
         if indoor_data:
             display_indoor_data(indoor_data)
 
     elif page == "Graphics":
         st.title("Weather Graphics")
         hourly = fetch_hourly_max(YOUR_HASH_PASSWD)
+        min_avg_max = fetch_min_avg_max(YOUR_HASH_PASSWD)
         render_heatmap_2(hourly)
-        render_basic_bar()
-        temp_gauge()
+        plot_temperature_stats(min_avg_max)
+
+
 
 
 if __name__ == "__main__":
