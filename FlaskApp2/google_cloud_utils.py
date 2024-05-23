@@ -2,6 +2,7 @@ from google.cloud import bigquery
 from google.cloud import texttospeech
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, Response
+
 import pandas as pd
 
 def insert_data_to_bigquery(client, data):
@@ -61,7 +62,7 @@ def query_latest_weather(client):
     else:
         raise Exception("No data available")
 
-def fetch_hourly_max_for_last_7_days():
+def fetch_hourly_max_for_last_7_days(client):
     query = """
     SELECT 
         DATETIME_TRUNC(DATETIME(date, time), HOUR) as hour, 
@@ -81,9 +82,9 @@ def fetch_hourly_max_for_last_7_days():
             "max_outdoor_temp": row.max_outdoor_temp,
             "max_outdoor_humidity": row.max_outdoor_humidity
         })
-    return hourly_data
+    return hourly_data
 
-def fetch_min_avg_max():
+def fetch_min_avg_max(client):
     query = """
     SELECT
       TIMESTAMP(DATETIME(date, time)) AS datetime,
@@ -114,7 +115,7 @@ def fetch_min_avg_max():
     }
     return result
 
-def fetch_min_avg_max_outdoor():
+def fetch_min_avg_max_outdoor(client):
     query = """
     SELECT
       TIMESTAMP(DATETIME(date, time)) AS datetime,
