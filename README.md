@@ -118,7 +118,7 @@ By following these steps, you'll have a robust deployment of your weather monito
 
 ### 📱 Device Configuration
 1. Connect the M5stack Core2 to [M5Flow](https://flow.m5stack.com/) and connect the sensors.
-2. Customize the Micropython (`display.py`), change the Wi-Fi credentials, and the endpoints for your deployed service.
+2. Customize the Micropython (`M5Stack/display.py`), change the Wi-Fi credentials, and the endpoints for your deployed service.
 4. Upload the relevant code from M5Flow to the device.
 
 ## 🗂 Project Structure
