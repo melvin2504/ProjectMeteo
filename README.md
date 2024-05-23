@@ -56,7 +56,7 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 Deploying the application on Google Cloud allows you to utilize powerful cloud-based services for handling data processing, storage, and web hosting. Follow these detailed steps to get your application running on Google Cloud.
 
 #### Step 1: Set Up Google Cloud Project
-1. **Create a Google Cloud Project**:
+  **Create a Google Cloud Project**:
    - Visit the [Google Cloud Console](https://console.cloud.google.com/).
    - Click on "IAM & Admin" in the left menu and then "Create a Project".
    - Enter a project name and select a billing account if necessary. Click 'Create'.
