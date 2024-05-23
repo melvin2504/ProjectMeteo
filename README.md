@@ -89,6 +89,9 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Set up environment variables for Google Cloud and OpenWeatherMap in config.py.
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
    - Build your container image using Google Cloud Build or your local machine.
+     ```sh
+     docker build -t eu.gcr.io/lab-test-1-415115/flaskapp:latest .
+     ```
 
 3. **Push the Container to Container Registry**:
    - Tag your built image appropriately for Google Container Registry.
