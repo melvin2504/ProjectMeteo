@@ -15,7 +15,7 @@ ICON_DIR = os.path.join(BASE_DIR, 'Icons')  # Path to the Icons folder
 IMAGE_DIR = os.path.join(BASE_DIR, 'Images')  # Path to the Images folder
 
 def fetch_latest_temperature():
-    url = 'http://127.0.0.1:8080/get-latest-temperature'  # Endpoint URL
+    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get-latest-temperature'  # Endpoint URL
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -27,7 +27,7 @@ def fetch_latest_temperature():
         return None
 
 def fetch_outdoor_weather(password):
-    response = requests.post("http://localhost:8080/get_outdoor_weather", json={"password": password})
+    response = requests.post('https://flaskapp8-vukguwbvha-oa.a.run.app/get_outdoor_weather', json={"passwd": password})
     if response.status_code == 200:
         return response.json()
     else:
@@ -35,9 +35,9 @@ def fetch_outdoor_weather(password):
         return None
     
 def fetch_latest_indoor(password):
-    url = 'http://127.0.0.1:8080/get-latest-indoor'  # Endpoint URL
+    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get-latest-indoor'  # Endpoint URL
     try:
-        response = requests.get(url, json={"password": password})
+        response = requests.post(url, json={"passwd": password})
         if response.status_code == 200:
             return response.json()
         else:
@@ -47,7 +47,7 @@ def fetch_latest_indoor(password):
         return None
 
 def fetch_daily_forecast(city_lat, city_lon, password):
-    url = 'http://127.0.0.1:8080/get_daily_forecast'  # Adjust the URL if Flask is running on a different host or port
+    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get_daily_forecast'  # Adjust the URL if Flask is running on a different host or port
     headers = {'Content-Type': 'application/json'}
     data = {
         "passwd": password,
@@ -66,7 +66,7 @@ def fetch_daily_forecast(city_lat, city_lon, password):
         return None
 
 def fetch_hourly_max(password):
-    response = requests.post("http://localhost:8080/hourly-max", json={"password": password})
+    response = requests.post("https://flaskapp8-vukguwbvha-oa.a.run.app/hourly-max", json={"passwd": password})
     if response.status_code == 200:
         return response.json()
     else:
@@ -74,9 +74,9 @@ def fetch_hourly_max(password):
         return None 
 
 def fetch_min_avg_max(password):
-    url = 'http://127.0.0.1:8080/get-min-avg-max'
+    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get-min-avg-max'
     try:
-        response = requests.post(url, json={"password": password})
+        response = requests.post(url, json={"passwd": password})
         if response.status_code == 200:
             return response.json()
         else:
@@ -87,9 +87,9 @@ def fetch_min_avg_max(password):
         return None
 
 def fetch_min_avg_max_outdoor(password):
-    url = 'http://127.0.0.1:8080/get-min-avg-max-outdoor'
+    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get-min-avg-max-outdoor'
     try:
-        response = requests.post(url, json={"password": password})
+        response = requests.post(url, json={"passwd": password})
         if response.status_code == 200:
             return response.json()
         else:
@@ -128,36 +128,100 @@ def plot_temperature_stats(data, title):
         df = pd.DataFrame(data)
         df['datetime'] = pd.to_datetime(df['datetime'])
 
-        # Set up dark mode style
-        plt.style.use('dark_background')
-        plt.rcParams.update({
-            'figure.facecolor': '#0e1117',
-            'axes.facecolor': '#0e1117',
-            'axes.edgecolor': 'white',
-            'axes.labelcolor': 'white',
-            'xtick.color': 'white',
-            'ytick.color': 'white',
-            'text.color': 'white',
-            'grid.color': 'gray',
-            'patch.edgecolor': 'white',
-            'legend.facecolor': '#0e1117',
-            'legend.edgecolor': 'white'
-        })
+        options = {
+            "title": {
+                "text": title,
+                "textStyle": {
+                    "color": "#ffffff"
+                },
+                "left": "center"
+            },
+            "tooltip": {
+                "trigger": "axis"
+            },
+            "legend": {
+                "data": ["Max Temperature", "Average Temperature", "Min Temperature"],
+                "textStyle": {
+                    "color": "#ffffff"
+                },
+                "top": "10%"
+            },
+            "grid": {
+                "left": "3%",
+                "right": "4%",
+                "bottom": "3%",
+                "containLabel": True
+            },
+            "xAxis": {
+                "type": "category",
+                "boundaryGap": False,
+                "data": df['datetime'].dt.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+                "axisLine": {
+                    "lineStyle": {
+                        "color": "#ffffff"
+                    }
+                },
+                "axisLabel": {
+                    "color": "#ffffff"
+                }
+            },
+            "yAxis": {
+                "type": "value",
+                "axisLine": {
+                    "lineStyle": {
+                        "color": "#ffffff"
+                    }
+                },
+                "axisLabel": {
+                    "color": "#ffffff"
+                },
+                "splitLine": {
+                    "lineStyle": {
+                        "color": "#444"
+                    }
+                }
+            },
+            "series": [
+                {
+                    "name": "Max Temperature",
+                    "type": "line",
+                    "data": df['max_temp'].tolist(),
+                    "itemStyle": {
+                        "color": "#FFA07A"
+                    },
+                    "lineStyle": {
+                        "color": "#FFA07A"
+                    }
+                },
+                {
+                    "name": "Average Temperature",
+                    "type": "line",
+                    "data": df['avg_temp'].tolist(),
+                    "itemStyle": {
+                        "color": "#87CEFA"
+                    },
+                    "lineStyle": {
+                        "color": "#87CEFA"
+                    }
+                },
+                {
+                    "name": "Min Temperature",
+                    "type": "line",
+                    "data": df['min_temp'].tolist(),
+                    "itemStyle": {
+                        "color": "#90EE90"
+                    },
+                    "lineStyle": {
+                        "color": "#90EE90"
+                    }
+                }
+            ],
+            "backgroundColor": "#0e1117"
+        }
 
-        fig, ax = plt.subplots(figsize=(10, 5))
-        fig.patch.set_facecolor('#0e1117')  # Set surrounding background color
-        ax.set_facecolor('#0e1117')  # Set background color of the plot area
+        st_echarts(options=options, height="500px")
 
-        ax.plot(df['datetime'], df['max_temp'], label='Max Temperature', color='#FF6347')  # Tomato
-        ax.plot(df['datetime'], df['avg_temp'], label='Average Temperature', color='#1E90FF')  # DodgerBlue
-        ax.plot(df['datetime'], df['min_temp'], label='Min Temperature', color='#32CD32')  # LimeGreen
 
-        ax.set_xlabel('Datetime', color='white')
-        ax.set_ylabel('Temperature (°C)', color='white')
-        ax.set_title(title, color='white')
-        ax.legend()
-        ax.grid(True)
-        st.pyplot(fig)
 
 
 def render_heatmap_2(data):
@@ -447,11 +511,9 @@ def main():
         forecast = fetch_daily_forecast(city_lat, city_lon, YOUR_HASH_PASSWD)
         display_forecast(forecast)
         outdoor_weather = fetch_outdoor_weather(YOUR_HASH_PASSWD)
-        if outdoor_weather:
-            display_outdoor_weather(outdoor_weather)
+        display_outdoor_weather(outdoor_weather)
         indoor_data = fetch_latest_indoor(YOUR_HASH_PASSWD)
-        if indoor_data:
-            display_indoor_data(indoor_data)
+        display_indoor_data(indoor_data)
 
     elif page == "Graphics":
         st.title("Weather Graphics")
