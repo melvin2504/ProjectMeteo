@@ -22,7 +22,7 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 - **Indoor Monitoring:** 🌡️ Temperature, humidity, air quality, and presence detection.
 - **Outdoor Monitoring:** 🌦️ Current weather conditions and forecasts using OpenWeatherMap API.
 - **Cloud Integration:** ☁️ Data storage and retrieval using Google BigQuery.
-- **Alerts and Notifications:** 🔊 Text-to-speech announcements for weather conditions when you pass by and visual notifications when air quality is bad.
+- **Alerts and Notifications:** 🔊 Text-to-speech announcements for weather conditions when you pass next to it and visual notifications when air quality is bad.
 - **User Interfaces:** 💻 Local interface on the M5stack device and a cloud-based dashboard.
 - **Historical Data Visualization:** 📊 Access and analyze past weather data on the Streamlit dashboard and on the M5Stack in a more simplistic way.
 
