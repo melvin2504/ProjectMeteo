@@ -59,3 +59,87 @@ def query_latest_weather(client):
         }
     else:
         raise Exception("No data available")
+
+def fetch_hourly_max_for_last_7_days():
+    query = """
+    SELECT 
+        DATETIME_TRUNC(DATETIME(date, time), HOUR) as hour, 
+        MAX(outdoor_temp) as max_outdoor_temp, 
+        MAX(outdoor_humidity) as max_outdoor_humidity
+    FROM lab-test-1-415115.weather_IoT_data.weather-records
+    WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
+    GROUP BY hour
+    ORDER BY hour DESC
+    """
+    query_job = client.query(query)
+    results = query_job.result()
+    hourly_data = []
+    for row in results:
+        hourly_data.append({
+            "hour": row.hour,
+            "max_outdoor_temp": row.max_outdoor_temp,
+            "max_outdoor_humidity": row.max_outdoor_humidity
+        })
+    return hourly_data
+
+def fetch_min_avg_max():
+    query = """
+    SELECT
+      TIMESTAMP(DATETIME(date, time)) AS datetime,
+      indoor_temp
+    FROM
+      lab-test-1-415115.weather_IoT_data.weather-records
+    WHERE
+      date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+    ORDER BY
+      datetime
+    """
+    query_job = client.query(query)
+    df = query_job.to_dataframe()
+
+    # Ensure datetime is in the correct format and set as index
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df.set_index('datetime', inplace=True)
+
+    # Resample the dataframe to 3-hour bins and calculate max, min, and mean temperatures
+    resampled_df = df['indoor_temp'].resample('3H').agg(['max', 'min', 'mean']).fillna(0)
+
+    # Format the result as a dictionary
+    result = {
+        'datetime': resampled_df.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+        'max_temp': resampled_df['max'].tolist(),
+        'min_temp': resampled_df['min'].tolist(),
+        'avg_temp': resampled_df['mean'].tolist(),
+    }
+    return result
+
+def fetch_min_avg_max_outdoor():
+    query = """
+    SELECT
+      TIMESTAMP(DATETIME(date, time)) AS datetime,
+      outdoor_temp
+    FROM
+      lab-test-1-415115.weather_IoT_data.weather-records
+    WHERE
+      date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+    ORDER BY
+      datetime
+    """
+    query_job = client.query(query)
+    df = query_job.to_dataframe()
+
+    # Ensure datetime is in the correct format and set as index
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df.set_index('datetime', inplace=True)
+
+    # Resample the dataframe to 3-hour bins and calculate max, min, and mean temperatures
+    resampled_df = df['outdoor_temp'].resample('3H').agg(['max', 'min', 'mean']).fillna(0)
+
+    # Format the result as a dictionary
+    result = {
+        'datetime': resampled_df.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+        'max_temp': resampled_df['max'].tolist(),
+        'min_temp': resampled_df['min'].tolist(),
+        'avg_temp': resampled_df['mean'].tolist(),
+    }
+    return result
