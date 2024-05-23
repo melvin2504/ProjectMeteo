@@ -2,6 +2,10 @@
 <img src="images/mainimage1.jpg" alt="Description of the image" style="width: 100%;">
 Welcome to our project repository ! This project involves implementing an indoor/outdoor weather monitor using M5stack IoT devices and sensors, integrated with a web dashboard deployed on the cloud. This solution provides real-time weather monitoring and forecasting, along with historical data visualization, all managed through Google Cloud services.
 
+## 👥 Contributors
+- Melvin Petracca (GitHub: @melvin2504) - Indoor monitoring and device interface.
+- Laurent Sierro (GitHub: @Aztol) - Cloud dashboard and Google Cloud integration.
+
 ## 📑 Table of Contents
 - [Project Overview](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-project-overview)
 - [Exciting Features](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-exciting-features)
@@ -165,10 +169,6 @@ Once you have downloaded the STL file, you can use any standard 3D printer to cr
 After printing, you can place your Core2 on the holder and attach the sensor to the back of the holder using double-sided adhesive tape. Additionally, there are two areas at the back where you can insert magnets to enhance the stability of your M5Stack. However, avoid using neodymium magnets! ⚠️ Neodymium magnets are extremely powerful and can interfere with electronic components, potentially damaging the circuitry of your device.
 
 This custom holder is an excellent way to enhance the usability of your M5Stack Core2 device, making it easy to interact with and adding an extra layer of stability and protection.
-
-## 👥 Contributors
-- Melvin Petracca (GitHub: @melvin2504) - Indoor monitoring and device interface.
-- Laurent Sierro (GitHub: @Aztol) - Cloud dashboard and Google Cloud integration.
 
 ## 🎥 Video Demonstration
 - Check out our [YouTube video demonstration](https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUJcmljayByb2xs) to see the project in action!
