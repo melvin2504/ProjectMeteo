@@ -104,6 +104,81 @@ def daily_forecast():
     else:
         return jsonify({"error": "Failed to fetch forecast"}), 500
 
+@app.route('/get-latest-indoor', methods=['GET'])
+def get_latest_indoor():
+    query = """
+    SELECT indoor_temp, indoor_humidity, indoor_tvoc, indoor_eco2
+    FROM lab-test-1-415115.weather_IoT_data.weather-records
+    ORDER BY time DESC
+    LIMIT 1
+    """
+    try:
+        query_job = client.query(query)
+        results = query_job.result()  # Wait for the job to complete.
+
+        for row in results:
+            indoor_data = {
+                "indoor_temp": row.indoor_temp,
+                "indoor_humidity": row.indoor_humidity,
+                "indoor_tvoc": row.indoor_tvoc,
+                "indoor_eco2": row.indoor_eco2
+            }
+            return jsonify(indoor_data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get_outdoor_weather', methods=['POST'])
+def get_outdoor_weather():
+    # Verify password from the request
+    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
+    
+    # Query to select the latest outdoor temperature, humidity, and description records
+    query = """
+    SELECT outdoor_temp, outdoor_humidity, outdoor_weather
+    FROM lab-test-1-415115.weather_IoT_data.weather-records
+    ORDER BY date desc, time desc limit 1
+    """
+    try:
+        query_job = client.query(query)  # Execute the query
+        results = query_job.result()  # Wait for results
+
+
+
+        # Extract data from query results
+        row = next(iter(results), None)  # Get the first result if available
+        if row:
+            icon_code = weather_icons.get(row.outdoor_weather, '01d')  # Get icon code, use 'default' if not found
+            return jsonify({
+                "outdoor_temp": row.outdoor_temp,
+                "outdoor_humidity": row.outdoor_humidity,
+                "outdoor_weather": row.outdoor_weather,
+                "icon_code": icon_code  # Include the icon code in the response
+            })
+        else:
+            return jsonify({"error": "No data available"}), 404
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+@app.route('/get-min-avg-max', methods=['POST'])
+def get_temperature_stats():
+    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
+    data = fetch_min_avg_max()
+    return jsonify(data)
+
+@app.route('/get-min-avg-max-outdoor', methods=['POST'])
+def get_temperature_stats_outdoor():
+    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
+    data = fetch_min_avg_max_outdoor()
+    return jsonify(data)
+
+@app.route('/hourly-max', methods=['POST'])
+def get_hourly_max():
+    data = fetch_hourly_max_for_last_7_days()
+    return jsonify(data)
+
 @app.route('/historical_data_graph', methods=['POST'])
 def historical_data_graph():
     # Verify password from the request
