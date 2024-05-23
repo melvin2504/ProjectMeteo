@@ -164,19 +164,19 @@ def get_outdoor_weather():
 def get_temperature_stats():
     if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
-    data = fetch_min_avg_max()
+    data = fetch_min_avg_max(client)
     return jsonify(data)
 
 @app.route('/get-min-avg-max-outdoor', methods=['POST'])
 def get_temperature_stats_outdoor():
     if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
-    data = fetch_min_avg_max_outdoor()
+    data = fetch_min_avg_max_outdoor(client)
     return jsonify(data)
 
 @app.route('/hourly-max', methods=['POST'])
 def get_hourly_max():
-    data = fetch_hourly_max_for_last_7_days()
+    data = fetch_hourly_max_for_last_7_days(client)
     return jsonify(data)
 
 @app.route('/historical_data_graph', methods=['POST'])
