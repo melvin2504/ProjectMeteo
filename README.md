@@ -136,7 +136,7 @@ By following these steps, you'll have a robust deployment of your weather monito
   <img src="images/standback.jpg" alt="Core2holder" width="300"/>
   <img src="images/standside.jpg" alt="Core2holder" width="300"/>
 </div>
-
+<br>
 To enhance your experience with the M5Stack Core2, you have the option to print a custom 3D holder. This stand not only secures your device but also positions it for optimal interaction and visibility.
 
 ### Get the 3D Model
