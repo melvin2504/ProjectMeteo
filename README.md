@@ -89,13 +89,16 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Set up environment variables for Google Cloud and OpenWeatherMap in config.py.
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
    - Build your container image using Google Cloud Build or your local machine.
+     ```sh
+     docker build -t eu.gcr.io/your-project-id/your-project-id:latest .
+     ```
 
 3. **Push the Container to Container Registry**:
    - Tag your built image appropriately for Google Container Registry.
    - Use `gcloud` commands to push the image to Google Cloud. For example:
      ```sh
      gcloud auth configure-docker
-     docker push gcr.io/your-project-id/your-image-name
+     docker push gcr.io/your-project-id/your-project-id
      ```
 
 4. **Deploy to Cloud Run**:
@@ -115,6 +118,7 @@ By following these steps, you'll have a robust deployment of your weather monito
    ```sh
    git clone https://github.com/melvin2504/ProjectMeteo.git
    cd ProjectMeteo
+   cd FlaskApp
 2. Install the required Python packages:
    ```sh
    pip install -r requirements.txt
