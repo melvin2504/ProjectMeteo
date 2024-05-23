@@ -122,6 +122,7 @@ By following these steps, you'll have a robust deployment of your weather monito
 4. Upload the relevant code from M5Flow to the device.
 
 ## 🗂 Project Structure
+### FlaskApp
 - **main.py**: Entry point for the Flask application.
 - **config.py**: Configuration file for API keys and other settings.
 - **google_cloud_utils.py**: Functions for interacting with Google Cloud services.
