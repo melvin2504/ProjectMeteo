@@ -129,6 +129,24 @@ By following these steps, you'll have a robust deployment of your weather monito
 - **requirements.txt**: List of required Python packages.
 - **Dockerfile**: Instructions for building a Docker image of the application.
 
+## 🖨️ 3D Printing Your M5Stack Core2 Holder
+
+To enhance your experience with the M5Stack Core2, you have the option to print a custom 3D holder. This stand not only secures your device but also positions it for optimal interaction and visibility.
+
+### Get the 3D Model
+You can find a suitable 3D model for the M5Stack Core2 stand by visiting this [Cults3D page](https://cults3d.com/fr/mod%C3%A8le-3d/gadget/m5stack-core-stand). The page features a specifically designed stand that accommodates the M5Stack Core2 perfectly.
+
+### Download the STL File
+The STL file for the 3D model is available in `3DStand/STAND_M5STACK.stl`
+
+### Printing Instructions
+Once you have downloaded the STL file, you can use any standard 3D printer to create the holder. Make sure to adjust your printer settings according to the material you choose and the recommendations provided by the STL file’s creator. Optimal settings ensure the best fit and durability of the holder.
+
+### Assembly
+After printing, you can place your Core2 on the holder and attach the sensor to the back of the holder using double-sided adhesive tape. Additionally, there are two areas at the back where you can insert magnets to enhance the stability of your M5Stack. However, avoid using neodymium magnets! ⚠️ Neodymium magnets are extremely powerful and can interfere with electronic components, potentially damaging the circuitry of your device.
+
+This custom holder is an excellent way to enhance the usability of your M5Stack Core2 device, making it easy to interact with and adding an extra layer of stability and protection.
+
 ## 👥 Contributors
 - Melvin Petracca (GitHub: @melvin2504) - Indoor monitoring and device interface.
 - Laurent Sierro (GitHub: @Aztol) - Cloud dashboard and Google Cloud integration.
