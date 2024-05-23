@@ -68,7 +68,7 @@ def fetch_hourly_max_for_last_7_days(client):
         DATETIME_TRUNC(DATETIME(date, time), HOUR) as hour, 
         MAX(outdoor_temp) as max_outdoor_temp, 
         MAX(outdoor_humidity) as max_outdoor_humidity
-    FROM lab-test-1-415115.weather_IoT_data.weather-records
+    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
     WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
     GROUP BY hour
     ORDER BY hour DESC
@@ -90,7 +90,7 @@ def fetch_min_avg_max(client):
       TIMESTAMP(DATETIME(date, time)) AS datetime,
       indoor_temp
     FROM
-      lab-test-1-415115.weather_IoT_data.weather-records
+      `lab-test-1-415115.weather_IoT_data.weather-records`
     WHERE
       date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
     ORDER BY
@@ -121,7 +121,7 @@ def fetch_min_avg_max_outdoor(client):
       TIMESTAMP(DATETIME(date, time)) AS datetime,
       outdoor_temp
     FROM
-      lab-test-1-415115.weather_IoT_data.weather-records
+      `lab-test-1-415115.weather_IoT_data.weather-records`
     WHERE
       date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
     ORDER BY
