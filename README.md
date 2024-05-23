@@ -83,10 +83,11 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
 
 #### Step 3: Deploy Application Using Google Cloud Run
 1. **Containerize Your Application**:
+   - Set up environment variables for Google Cloud and OpenWeatherMap in config.py.
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
    - Build your container image using Google Cloud Build or your local machine.
 
-2. **Push the Container to Container Registry**:
+3. **Push the Container to Container Registry**:
    - Tag your built image appropriately for Google Container Registry.
    - Use `gcloud` commands to push the image to Google Cloud. For example:
      ```sh
@@ -94,7 +95,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
      docker push gcr.io/your-project-id/your-image-name
      ```
 
-3. **Deploy to Cloud Run**:
+4. **Deploy to Cloud Run**:
    - Visit the Cloud Run section in Google Cloud Console.
    - Click "Create Service".
    - Select your image from Container Registry, configure the service settings like memory, allowed requests, and concurrency.
