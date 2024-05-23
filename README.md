@@ -115,6 +115,7 @@ By following these steps, you'll have a robust deployment of your weather monito
    ```sh
    git clone https://github.com/melvin2504/ProjectMeteo.git
    cd ProjectMeteo
+   cd FlaskApp
 2. Install the required Python packages:
    ```sh
    pip install -r requirements.txt
