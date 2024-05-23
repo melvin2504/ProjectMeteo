@@ -130,6 +130,16 @@ By following these steps, you'll have a robust deployment of your weather monito
 - **weather.py**: Functions for fetching and processing weather data.
 - **requirements.txt**: List of required Python packages.
 - **Dockerfile**: Instructions for building a Docker image of the application.
+### Icons
+- All the graphical elements needed for the interface of the M5Stack and Streamlit App. You will need to upload them through [M5Flow](https://flow.m5stack.com/).
+### M5Stack
+- Micropython code to upload on the device.
+### StreamlitApp
+- Python code of the streamlit interface.
+### images
+- Images of my personal M5Stack used for the readme.
+### 3DStand
+- STL file in order to 3D print the stand.
 
 ## 🖨️ 3D Printing Your M5Stack Core2 Holder
 <br>
