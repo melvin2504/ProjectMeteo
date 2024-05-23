@@ -108,7 +108,7 @@ def daily_forecast():
 def get_latest_indoor():
     query = """
     SELECT indoor_temp, indoor_humidity, indoor_tvoc, indoor_eco2
-    FROM lab-test-1-415115.weather_IoT_data.weather-records
+    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
     ORDER BY time DESC
     LIMIT 1
     """
