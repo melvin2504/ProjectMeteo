@@ -85,7 +85,7 @@ weather_icons = {
     'overcast clouds': '04d'  
 }
 
-#OUTILS 
+#OUTILsss 
 
 def get_weather(api_key, city):
     """Fetches the current weather for a specified city using OpenWeatherMap's API."""
