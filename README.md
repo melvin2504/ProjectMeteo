@@ -3,16 +3,17 @@
 Welcome to our project repository! This project involves implementing an indoor/outdoor weather monitor using M5stack IoT devices and sensors, integrated with a web dashboard deployed on the cloud. This solution provides real-time weather monitoring and forecasting, along with historical data visualization, all managed through Google Cloud services.
 
 ## 📑 Table of Contents
-- [Project Overview](#project-overview)
-- [Exciting Features](#exciting-features)
-- [Hardware and Software Requirements](#hardware-and-software-requirements)
-- [Setup and Deployment Instructions](#setup-and-deployment-instructions)
-  - [1. Google Cloud Setup](#1-google-cloud-setup)
-  - [2. Local Deployment](#2-local-deployment)
-  - [3. Device Configuration](#3-device-configuration)
-- [Project Structure](#project-structure)
-- [Contributors](#contributors)
-- [Video Demonstration](#video-demonstration)
+- [🚀 Project Overview](#project-overview)
+- [⭐ Exciting Features](#exciting-features)
+- [🛠 Hardware and Software Requirements](#hardware-and-software-requirements)
+- [📦 Setup and Deployment Instructions](#setup-and-deployment-instructions)
+  - [🌍 Google Cloud Deployment Instructions](#google-cloud-deployment-instructions)
+  - [💻 Local Deployment](#local-deployment)
+  - [📱 Device Configuration](#device-configuration)
+- [🗂 Project Structure](#project-structure)
+- [🖨️ 3D Printing Your M5Stack Core2 Holder](#3d-printing-your-m5stack-core2-holder)
+- [👥 Contributors](#contributors)
+- [🎥 Video Demonstration](#video-demonstration)
 
 ## 🚀 Project Overview
 This project utilizes the M5stack Core2 IoT device along with various sensors to monitor both indoor and outdoor weather conditions. The data is displayed on the device interface and a cloud-based dashboard built with Streamlit. All data is stored in Google Cloud's BigQuery, allowing for both real-time and historical data analysis.
