@@ -86,6 +86,18 @@ def fetch_min_avg_max(password):
         st.error(f'Error: {e}')
         return None
 
+def fetch_min_avg_max_outdoor(password):
+    url = 'http://127.0.0.1:8080/get-min-avg-max-outdoor'
+    try:
+        response = requests.post(url, json={"password": password})
+        if response.status_code == 200:
+            return response.json()
+        else:
+            st.error('Failed to fetch temperature stats')
+            return None
+    except requests.exceptions.RequestException as e:
+        st.error(f'Error: {e}')
+        return None
 
    
 
@@ -111,7 +123,7 @@ def render_basic_bar():
 def round_time_to_nearest_hour(time):
     return (time + timedelta(minutes=30)).replace(minute=0, second=0, microsecond=0)
 
-def plot_temperature_stats(data):
+def plot_temperature_stats(data, title):
     if data:
         df = pd.DataFrame(data)
         df['datetime'] = pd.to_datetime(df['datetime'])
@@ -142,7 +154,7 @@ def plot_temperature_stats(data):
 
         ax.set_xlabel('Datetime', color='white')
         ax.set_ylabel('Temperature (°C)', color='white')
-        ax.set_title('Temperature Stats (Max, Avg, Min) Every 3 Hours - Last 7 Days', color='white')
+        ax.set_title(title, color='white')
         ax.legend()
         ax.grid(True)
         st.pyplot(fig)
@@ -445,8 +457,12 @@ def main():
         st.title("Weather Graphics")
         hourly = fetch_hourly_max(YOUR_HASH_PASSWD)
         min_avg_max = fetch_min_avg_max(YOUR_HASH_PASSWD)
+        min_avg_max_outdoor = fetch_min_avg_max_outdoor(YOUR_HASH_PASSWD)   
         render_heatmap_2(hourly)
-        plot_temperature_stats(min_avg_max)
+        title_indoor = "Indoor temperature (Min, Avg, Max) every 3h for the last 7 days"
+        plot_temperature_stats(min_avg_max, title_indoor)
+        title_outdoor = "Outdoor temperature (Min, Avg, Max) every 3h for the last 7 days"
+        plot_temperature_stats(min_avg_max_outdoor, title_outdoor)
 
 
 

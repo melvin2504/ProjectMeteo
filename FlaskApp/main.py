@@ -154,6 +154,37 @@ def fetch_min_avg_max():
     }
     return result
 
+def fetch_min_avg_max_outdoor():
+    query = """
+    SELECT
+      TIMESTAMP(DATETIME(date, time)) AS datetime,
+      outdoor_temp
+    FROM
+      `lab-test-1-415115.weather_IoT_data.weather-records`
+    WHERE
+      date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+    ORDER BY
+      datetime
+    """
+    query_job = client.query(query)
+    df = query_job.to_dataframe()
+
+    # Ensure datetime is in the correct format and set as index
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df.set_index('datetime', inplace=True)
+
+    # Resample the dataframe to 3-hour bins and calculate max, min, and mean temperatures
+    resampled_df = df['outdoor_temp'].resample('3H').agg(['max', 'min', 'mean']).fillna(0)
+
+    # Format the result as a dictionary
+    result = {
+        'datetime': resampled_df.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+        'max_temp': resampled_df['max'].tolist(),
+        'min_temp': resampled_df['min'].tolist(),
+        'avg_temp': resampled_df['mean'].tolist(),
+    }
+    return result
+
 @app.route('/')
 def index():
     return "Welcome to the Weather App!"
@@ -308,6 +339,13 @@ def get_temperature_stats():
     if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
     data = fetch_min_avg_max()
+    return jsonify(data)
+
+@app.route('/get-min-avg-max-outdoor', methods=['POST'])
+def get_temperature_stats_outdoor():
+    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
+    data = fetch_min_avg_max_outdoor()
     return jsonify(data)
 
 @app.route('/get_daily_forecast', methods=['POST'])
