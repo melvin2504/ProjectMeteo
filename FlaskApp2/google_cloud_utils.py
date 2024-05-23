@@ -1,6 +1,7 @@
 from google.cloud import bigquery
 from google.cloud import texttospeech
 from datetime import datetime, timedelta
+from flask import Flask, request, jsonify, Response
 import pandas as pd
 
 def insert_data_to_bigquery(client, data):
