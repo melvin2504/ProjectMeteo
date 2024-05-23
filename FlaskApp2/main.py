@@ -158,21 +158,21 @@ def get_outdoor_weather():
         else:
             return jsonify({"error": "No data available"}), 404
     except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 @app.route('/get-min-avg-max', methods=['POST'])
 def get_temperature_stats():
     if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
     data = fetch_min_avg_max()
-    return jsonify(data)
+    return jsonify(data)
 
 @app.route('/get-min-avg-max-outdoor', methods=['POST'])
 def get_temperature_stats_outdoor():
     if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
     data = fetch_min_avg_max_outdoor()
-    return jsonify(data)
+    return jsonify(data)
 
 @app.route('/hourly-max', methods=['POST'])
 def get_hourly_max():
