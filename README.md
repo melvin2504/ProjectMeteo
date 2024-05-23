@@ -50,16 +50,66 @@ This project utilizes the M5stack Core2 IoT device along with various sensors to
 
 ## 📦 Setup and Deployment Instructions
 
-### 1. Google Cloud Setup
-1. Create a Google Cloud project and enable the BigQuery and Text-to-Speech APIs.
-2. Set up a BigQuery dataset and table for storing sensor and outdoor data.
-3. Obtain the necessary credentials and save them as `google_credentials.json`.
+### 🚀 Google Cloud Deployment Instructions
+
+Deploying the application on Google Cloud allows you to utilize powerful cloud-based services for handling data processing, storage, and web hosting. Follow these detailed steps to get your application running on Google Cloud.
+
+#### Step 1: Set Up Google Cloud Project
+1. **Create a Google Cloud Project**:
+   - Visit the [Google Cloud Console](https://console.cloud.google.com/).
+   - Click on "IAM & Admin" in the left menu and then "Create a Project".
+   - Enter a project name and select a billing account if necessary. Click 'Create'.
+
+2. **Enable APIs**:
+   - In the search bar at the top of the Google Cloud Console, search for "BigQuery API" and "Text-to-Speech API".
+   - Enable both APIs for your project.
+
+3. **Create BigQuery Dataset**:
+   - Navigate to the BigQuery service.
+   - In the BigQuery console, click on your project name and select "Create Dataset".
+   - Provide a dataset ID and set other configurations as needed, then click 'Create'.
+
+#### Step 2: Obtain Google Cloud Credentials
+1. **Create Service Account**:
+   - Go to "IAM & Admin" > "Service accounts".
+   - Click "Create Service Account", name it, and grant it project-level roles like BigQuery Admin, and Text-to-Speech User.
+   - Click 'Create'.
+
+2. **Create and Download Credentials**:
+   - In the service accounts list, click on the newly created service account.
+   - Go to "Keys" tab and click on "Add Key" > "Create new key".
+   - Choose JSON and download the key file. This is your `google_credentials.json`. This will be usefull for a local use.
+
+#### Step 3: Deploy Application Using Google Cloud Run
+1. **Containerize Your Application**:
+   - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
+   - Build your container image using Google Cloud Build or your local machine.
+
+2. **Push the Container to Container Registry**:
+   - Tag your built image appropriately for Google Container Registry.
+   - Use `gcloud` commands to push the image to Google Cloud. For example:
+     ```sh
+     gcloud auth configure-docker
+     docker push gcr.io/your-project-id/your-image-name
+     ```
+
+3. **Deploy to Cloud Run**:
+   - Visit the Cloud Run section in Google Cloud Console.
+   - Click "Create Service".
+   - Select your image from Container Registry, configure the service settings like memory, allowed requests, and concurrency.
+   - Set environment variables as needed (e.g., API keys, service account paths).
+   - Click 'Create' to deploy. Cloud Run will provide a URL to access your deployed application.
+
+#### Step 4: Accessing the Application
+- Once deployed, access the application via the URL provided by Cloud Run. The web interface should be ready to interact with your M5Stack device and Google Cloud backend services for real-time and historical weather data visualization.
+
+By following these steps, you'll have a robust deployment of your weather monitoring application running on Google Cloud, leveraging its powerful services for scalability and performance.
 
 ### 2. Local Deployment
 1. Clone this repository:
    ```sh
    git clone https://github.com/melvin2504/ProjectMeteo.git
-   cd FlaskApp
+   cd ProjectMeteo
 2. Install the required Python packages:
    ```sh
    pip install -r requirements.txt
