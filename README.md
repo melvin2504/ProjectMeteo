@@ -90,7 +90,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
    - Build your container image using Google Cloud Build or your local machine.
      ```sh
-     docker build -t eu.gcr.io/lab-test-1-415115/flaskapp:latest .
+     docker build -t eu.gcr.io/your-project-id/your-project-id:latest .
      ```
 
 3. **Push the Container to Container Registry**:
@@ -98,7 +98,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Use `gcloud` commands to push the image to Google Cloud. For example:
      ```sh
      gcloud auth configure-docker
-     docker push gcr.io/your-project-id/your-image-name
+     docker push gcr.io/your-project-id/your-project-id
      ```
 
 4. **Deploy to Cloud Run**:
