@@ -139,7 +139,7 @@ By following these steps, you'll have a robust deployment of your weather monito
 ### images
 - Images of my personal M5Stack used for the readme.
 ### 3DStand
-- STL file in order to 3D print the stand.
+- STL file in order to 3D print the holder.
 
 ## 🖨️ 3D Printing Your M5Stack Core2 Holder
 <br>
