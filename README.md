@@ -101,7 +101,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Click 'Create' to deploy. Cloud Run will provide a URL to access your deployed application.
 
 #### Step 4: Accessing the Application
-- Once deployed, access the application via the URL provided by Cloud Run. The web interface should be ready to interact with your M5Stack device and Google Cloud backend services for real-time and historical weather data visualization.
+- Once deployed, access the application via the URL provided by Cloud Run. It will be the endpoint to use in your Micropython code for your M5Stack in order to use backend services.
 
 By following these steps, you'll have a robust deployment of your weather monitoring application running on Google Cloud, leveraging its powerful services for scalability and performance.
 
