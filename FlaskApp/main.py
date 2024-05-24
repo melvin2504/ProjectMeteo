@@ -3,7 +3,7 @@ import os
 from google.cloud import bigquery
 from google.cloud import texttospeech
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from openai import OpenAI
 import pandas as pd
 
@@ -186,6 +186,36 @@ def fetch_min_avg_max_outdoor():
     }
     return result
 
+def fetch_tvoc_co2():
+    query = """
+    SELECT 
+        TIMESTAMP_TRUNC(time, HOUR) as datetime,
+        AVG(indoor_humidity) as indoor_humidity,
+        AVG(indoor_eco2) as indoor_eco2,
+        AVG(indoor_tvoc) as indoor_tvoc
+    FROM `your_project.your_dataset.indoor_conditions`
+    WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
+    GROUP BY datetime
+    ORDER BY datetime DESC
+    """
+
+    query_job = client.query(query)
+    df = query_job.to_dataframe()
+
+    # Ensure datetime is in the correct format and set as index
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df.set_index('datetime', inplace=True)
+
+    # Format the result as a dictionary
+    result = {
+        'datetime': df.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+        'indoor_humidity': df['indoor_humidity'].tolist(),
+        'indoor_eco2': df['indoor_eco2'].tolist(),
+        'indoor_tvoc': df['indoor_tvoc'].tolist(),
+    }
+    print(result)
+    return result
+
 @app.route('/')
 def index():
     return "Welcome to the Weather App!"
@@ -348,6 +378,13 @@ def get_temperature_stats_outdoor():
         return jsonify({"error": "Incorrect Password!"}), 401
     data = fetch_min_avg_max_outdoor()
     return jsonify(data)
+
+@app.route('/get-tvoc-co2', methods=['GET'])
+def get_tvoc_co2():
+    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
+        return jsonify({"error": "Incorrect Password!"}), 401
+    df = fetch_tvoc_co2()
+    return jsonify(df)
 
 @app.route('/get_daily_forecast', methods=['POST'])
 def daily_forecast():

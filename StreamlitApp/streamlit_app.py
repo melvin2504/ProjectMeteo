@@ -99,7 +99,10 @@ def fetch_min_avg_max_outdoor(password):
         st.error(f'Error: {e}')
         return None
 
-   
+def fetch_tvoc_co2(password):
+    url = 'http://127.0.0.1:8080/get-tvoc-co2'
+    response = requests.get(url, json={"passwd": password})
+    return response.json()
 
 def render_basic_bar():
     option = {
@@ -220,9 +223,6 @@ def plot_temperature_stats(data, title):
         }
 
         st_echarts(options=options, height="500px")
-
-
-
 
 def render_heatmap_2(data):
     if data:
@@ -498,6 +498,37 @@ def display_indoor_data(indoor_data):
         with cols[3]:
             st.metric("Indoor eCO2", f"{indoor_data['indoor_eco2']} ppm")
 
+def plot_indoor_conditions(data):
+    # Convert 'time' column to datetime
+    data['time'] = pd.to_datetime(data['time'])
+
+    # Plotting
+    fig, ax1 = plt.subplots()
+
+    ax2 = ax1.twinx()
+    ax3 = ax1.twinx()
+
+    ax3.spines['right'].set_position(('outward', 60))  # Offset the third y-axis
+
+    # Plot Indoor Humidity
+    ax1.plot(data['time'], data['indoor_humidity'], 'g-', label='Indoor Humidity (%)')
+    ax1.set_xlabel('Time')
+    ax1.set_ylabel('Humidity Level (%)', color='g')
+    ax1.tick_params('y', colors='g')
+
+    # Plot CO2 Level
+    ax2.plot(data['time'], data['indoor_eco2'], 'b-', label='CO2 Level (ppm)')
+    ax2.set_ylabel('CO2 Level (ppm)', color='b')
+    ax2.tick_params('y', colors='b')
+
+    # Plot TVOC Level
+    ax3.plot(data['time'], data['indoor_tvoc'], 'r-', label='TVOC Level (ppb)')
+    ax3.set_ylabel('TVOC Level (ppb)', color='r')
+    ax3.tick_params('y', colors='r')
+
+    fig.tight_layout()
+    st.pyplot(fig)
+
 def main():
     st.sidebar.title("Navigation")
     st.sidebar.markdown("## Pages")
@@ -525,6 +556,8 @@ def main():
         plot_temperature_stats(min_avg_max, title_indoor)
         title_outdoor = "Outdoor temperature (Min, Avg, Max) every 3h for the last 7 days"
         plot_temperature_stats(min_avg_max_outdoor, title_outdoor)
+        indoor_data = fetch_tvoc_co2(YOUR_HASH_PASSWD)
+        plot_indoor_conditions(indoor_data)
 
 
 
