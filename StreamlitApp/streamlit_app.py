@@ -101,7 +101,7 @@ def fetch_min_avg_max_outdoor(password):
 
 def fetch_tvoc_co2(password):
     url = 'http://127.0.0.1:8080/get-tvoc-co2'
-    response = requests.get(url, json={"passwd": password})
+    response = requests.post(url, json={"passwd": password})
     return response.json()
 
 def render_basic_bar():
@@ -190,10 +190,10 @@ def plot_temperature_stats(data, title):
                     "type": "line",
                     "data": df['max_temp'].tolist(),
                     "itemStyle": {
-                        "color": "#FFA07A"
+                        "color": "red"
                     },
                     "lineStyle": {
-                        "color": "#FFA07A"
+                        "color": "red"
                     }
                 },
                 {
@@ -201,10 +201,10 @@ def plot_temperature_stats(data, title):
                     "type": "line",
                     "data": df['avg_temp'].tolist(),
                     "itemStyle": {
-                        "color": "#87CEFA"
+                        "color": "blue"
                     },
                     "lineStyle": {
-                        "color": "#87CEFA"
+                        "color": "blue"
                     }
                 },
                 {
@@ -212,10 +212,10 @@ def plot_temperature_stats(data, title):
                     "type": "line",
                     "data": df['min_temp'].tolist(),
                     "itemStyle": {
-                        "color": "#90EE90"
+                        "color": "green"
                     },
                     "lineStyle": {
-                        "color": "#90EE90"
+                        "color": "green"
                     }
                 }
             ],
@@ -499,37 +499,166 @@ def display_indoor_data(indoor_data):
             st.metric("Indoor eCO2", f"{indoor_data['indoor_eco2']} ppm")
 
 def plot_indoor_conditions(data):
-    # Convert 'time' column to datetime
-    data['time'] = pd.to_datetime(data['time'])
+    if not data:
+        st.warning("No data available to plot.")
+        return
 
-    # Plotting
-    fig, ax1 = plt.subplots()
+    # Convert data to DataFrame
+    df = pd.DataFrame(data)
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    
+    # Sort the DataFrame by datetime to ensure the oldest date is on the left
+    df.sort_values('datetime', inplace=True)
 
-    ax2 = ax1.twinx()
-    ax3 = ax1.twinx()
+    # Round data to 2 decimal places
+    df['indoor_humidity'] = df['indoor_humidity'].round(2)
+    df['indoor_eco2'] = df['indoor_eco2'].round(2)
+    df['indoor_tvoc'] = df['indoor_tvoc'].round(2)
 
-    ax3.spines['right'].set_position(('outward', 60))  # Offset the third y-axis
+    options = {
+        "title": {
+            "text": 'Indoor Conditions Over Time',
+            "textStyle": {
+                "color": "#ffffff"
+            },
+            "left": 'center'
+        },
+        "tooltip": {
+            "trigger": 'axis'
+        },
+        "legend": {
+            "data": ['Indoor Humidity (%)', 'CO2 Level (ppm)', 'TVOC Level (ppb)'],
+            "textStyle": {
+                "color": "#ffffff"
+            },
+            "top": "10%"
+        },
+        "grid": {
+            "left": '3%',
+            "right": '4%',
+            "bottom": '3%',
+            "containLabel": True
+        },
+        "xAxis": {
+            "type": 'category',
+            "boundaryGap": False,
+            "data": df['datetime'].dt.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+            "axisLine": {
+                "lineStyle": {
+                    "color": "#ffffff"
+                }
+            },
+            "axisLabel": {
+                "color": "#ffffff"
+            }
+        },
+        "yAxis": [
+            {
+                "type": 'value',
+                "name": 'Humidity',
+                "position": 'left',
+                "axisLine": {
+                    "lineStyle": {
+                        "color": 'green'
+                    }
+                },
+                "axisLabel": {
+                    "formatter": '{value} %',
+                    "color": "#ffffff"
+                },
+                "splitLine": {
+                    "lineStyle": {
+                        "color": "#444"
+                    }
+                }
+            },
+            {
+                "type": 'value',
+                "name": 'CO2',
+                "position": 'right',
+                "offset": 50,
+                "axisLine": {
+                    "lineStyle": {
+                        "color": 'blue'
+                    }
+                },
+                "axisLabel": {
+                    "formatter": '{value} ppm',
+                    "color": "#ffffff"
+                },
+                "splitLine": {
+                    "lineStyle": {
+                        "color": "#444"
+                    }
+                }
+            },
+            {
+                "type": 'value',
+                "name": 'TVOC',
+                "position": 'right',
+                "axisLine": {
+                    "lineStyle": {
+                        "color": 'red'
+                    }
+                },
+                "axisLabel": {
+                    "formatter": '{value} ppb',
+                    "color": "#ffffff"
+                },
+                "splitLine": {
+                    "lineStyle": {
+                        "color": "#444"
+                    }
+                }
+            }
+        ],
+        "series": [
+            {
+                "name": 'Indoor Humidity (%)',
+                "type": 'line',
+                "data": df['indoor_humidity'].tolist(),
+                "yAxisIndex": 0,
+                "itemStyle": {
+                    "color": 'green'
+                },
+                "lineStyle": {
+                    "color": 'green'
+                }
+            },
+            {
+                "name": 'CO2 Level (ppm)',
+                "type": 'line',
+                "data": df['indoor_eco2'].tolist(),
+                "yAxisIndex": 1,
+                "itemStyle": {
+                    "color": 'blue'
+                },
+                "lineStyle": {
+                    "color": 'blue'
+                }
+            },
+            {
+                "name": 'TVOC Level (ppb)',
+                "type": 'line',
+                "data": df['indoor_tvoc'].tolist(),
+                "yAxisIndex": 2,
+                "itemStyle": {
+                    "color": 'red'
+                },
+                "lineStyle": {
+                    "color": 'red'
+                }
+            }
+        ],
+        "backgroundColor": "#0e1117"
+    }
 
-    # Plot Indoor Humidity
-    ax1.plot(data['time'], data['indoor_humidity'], 'g-', label='Indoor Humidity (%)')
-    ax1.set_xlabel('Time')
-    ax1.set_ylabel('Humidity Level (%)', color='g')
-    ax1.tick_params('y', colors='g')
+    # Increase the size of the chart
+    st_echarts(options=options, height="600px", width="100%")
 
-    # Plot CO2 Level
-    ax2.plot(data['time'], data['indoor_eco2'], 'b-', label='CO2 Level (ppm)')
-    ax2.set_ylabel('CO2 Level (ppm)', color='b')
-    ax2.tick_params('y', colors='b')
-
-    # Plot TVOC Level
-    ax3.plot(data['time'], data['indoor_tvoc'], 'r-', label='TVOC Level (ppb)')
-    ax3.set_ylabel('TVOC Level (ppb)', color='r')
-    ax3.tick_params('y', colors='r')
-
-    fig.tight_layout()
-    st.pyplot(fig)
 
 def main():
+    st.set_page_config(layout="wide")
     st.sidebar.title("Navigation")
     st.sidebar.markdown("## Pages")
     page = st.sidebar.radio("Select a page", ["Welcome", "Graphics"], label_visibility='collapsed')

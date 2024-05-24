@@ -189,11 +189,11 @@ def fetch_min_avg_max_outdoor():
 def fetch_tvoc_co2():
     query = """
     SELECT 
-        TIMESTAMP_TRUNC(time, HOUR) as datetime,
+        DATETIME_TRUNC(DATETIME(date, time), HOUR) as datetime,
         AVG(indoor_humidity) as indoor_humidity,
         AVG(indoor_eco2) as indoor_eco2,
         AVG(indoor_tvoc) as indoor_tvoc
-    FROM `your_project.your_dataset.indoor_conditions`
+    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
     WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
     GROUP BY datetime
     ORDER BY datetime DESC
@@ -201,7 +201,8 @@ def fetch_tvoc_co2():
 
     query_job = client.query(query)
     df = query_job.to_dataframe()
-
+    if df.empty:
+        return {"error": "No data available"}
     # Ensure datetime is in the correct format and set as index
     df['datetime'] = pd.to_datetime(df['datetime'])
     df.set_index('datetime', inplace=True)
@@ -379,11 +380,12 @@ def get_temperature_stats_outdoor():
     data = fetch_min_avg_max_outdoor()
     return jsonify(data)
 
-@app.route('/get-tvoc-co2', methods=['GET'])
+@app.route('/get-tvoc-co2', methods=['POST'])
 def get_tvoc_co2():
-    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
+    if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
     df = fetch_tvoc_co2()
+    print(df)
     return jsonify(df)
 
 @app.route('/get_daily_forecast', methods=['POST'])
