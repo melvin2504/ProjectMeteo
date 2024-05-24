@@ -203,9 +203,9 @@ def historical_data_graph():
 
     return response
 
-@app.route('/get-tvoc-co2', methods=['GET'])
+@app.route('/get-tvoc-co2', methods=['POST'])
 def get_tvoc_co2():
-    if request.get_json(force=True)["password"] != YOUR_HASH_PASSWD:
+    if request.get_json(force=True)["passwd"] != YOUR_HASH_PASSWD:
         return jsonify({"error": "Incorrect Password!"}), 401
     df = fetch_tvoc_co2(client)
     return jsonify(df)
