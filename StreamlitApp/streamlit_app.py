@@ -12,7 +12,7 @@ import pytz
 
 YOUR_HASH_PASSWD = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
 # Setting BASE_DIR to the parent directory of the directory where the script file resides
-BASE_DIR = Path(__file__).resolve().parent.parent  # This goes one level up from the StreamlitApp directory
+BASE_DIR = Path(__file__).resolve().parent
 ICON_DIR = os.path.join(BASE_DIR, 'Icons')  # Correct path to the Icons folder
 IMAGE_DIR = os.path.join(BASE_DIR, 'images')  # Correct path to the Images folder
 
