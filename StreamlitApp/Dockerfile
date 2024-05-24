@@ -6,7 +6,9 @@ COPY requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
 
 COPY . /app
-
+# Go up one directory and copy Icons and images into the container
+COPY ../Icons /app/Icons
+COPY ../images /app/images
 # Expose the port that Streamlit runs on
 EXPOSE 8501
 
