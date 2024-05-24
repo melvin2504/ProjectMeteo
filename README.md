@@ -139,7 +139,7 @@ By following these steps, you'll have a robust deployment of your weather monito
 - **requirements.txt**: List of required Python packages.
 - **Dockerfile**: Instructions for building a Docker image of the application.
 ### Icons
-- All the graphical elements needed for the interface of the M5Stack and Streamlit App. You will need to upload them through [M5Flow](https://flow.m5stack.com/).
+- All the graphical elements needed for the interface of the M5Stack and Streamlit App. You will need to upload them through [M5Flow](https://flow.m5stack.com/) in order to store them in the Core2 memory.
 ### M5Stack
 - Micropython code to upload on the device.
 ### StreamlitApp
