@@ -1,0 +1,7 @@
+streamlit
+pandas
+matplotlib
+streamlit-echarts
+requests
+Pillow
+pytz
