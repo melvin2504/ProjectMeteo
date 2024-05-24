@@ -5,3 +5,4 @@ streamlit-echarts
 requests
 Pillow
 pytz
+db-dtypes
