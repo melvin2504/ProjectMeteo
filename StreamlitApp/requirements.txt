@@ -7,3 +7,4 @@ Pillow
 pytz
 db-dtypes
 datetime
+pathlib
