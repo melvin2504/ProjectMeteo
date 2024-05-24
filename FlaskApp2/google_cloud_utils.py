@@ -153,7 +153,7 @@ def fetch_tvoc_co2(client):
         AVG(indoor_humidity) as indoor_humidity,
         AVG(indoor_eco2) as indoor_eco2,
         AVG(indoor_tvoc) as indoor_tvoc
-    FROM `your_project.your_dataset.indoor_conditions`
+    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
     WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
     GROUP BY datetime
     ORDER BY datetime DESC
