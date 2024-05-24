@@ -145,3 +145,33 @@ def fetch_min_avg_max_outdoor(client):
         'avg_temp': resampled_df['mean'].tolist(),
     }
     return result
+
+def fetch_tvoc_co2(client):
+    query = """
+    SELECT 
+        TIMESTAMP_TRUNC(time, HOUR) as datetime,
+        AVG(indoor_humidity) as indoor_humidity,
+        AVG(indoor_eco2) as indoor_eco2,
+        AVG(indoor_tvoc) as indoor_tvoc
+    FROM `your_project.your_dataset.indoor_conditions`
+    WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
+    GROUP BY datetime
+    ORDER BY datetime DESC
+    """
+
+    query_job = client.query(query)
+    df = query_job.to_dataframe()
+
+    # Ensure datetime is in the correct format and set as index
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df.set_index('datetime', inplace=True)
+
+    # Format the result as a dictionary
+    result = {
+        'datetime': df.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+        'indoor_humidity': df['indoor_humidity'].tolist(),
+        'indoor_eco2': df['indoor_eco2'].tolist(),
+        'indoor_tvoc': df['indoor_tvoc'].tolist(),
+    }
+    print(result)
+    return result
