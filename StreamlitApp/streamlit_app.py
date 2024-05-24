@@ -12,10 +12,10 @@ import pytz
 YOUR_HASH_PASSWD = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ICON_DIR = os.path.join(BASE_DIR, 'Icons')  # Path to the Icons folder
-IMAGE_DIR = os.path.join(BASE_DIR, 'Images')  # Path to the Images folder
+IMAGE_DIR = os.path.join(BASE_DIR, 'images')  # Path to the Images folder
 
 def fetch_latest_temperature():
-    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get-latest-temperature'  # Endpoint URL
+    url = 'https://flaskapp9-vukguwbvha-oa.a.run.app/get-latest-temperature'  # Endpoint URL
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -27,7 +27,7 @@ def fetch_latest_temperature():
         return None
 
 def fetch_outdoor_weather(password):
-    response = requests.post('https://flaskapp8-vukguwbvha-oa.a.run.app/get_outdoor_weather', json={"passwd": password})
+    response = requests.post('https://flaskapp9-vukguwbvha-oa.a.run.app/get_outdoor_weather', json={"passwd": password})
     if response.status_code == 200:
         return response.json()
     else:
@@ -35,7 +35,7 @@ def fetch_outdoor_weather(password):
         return None
     
 def fetch_latest_indoor(password):
-    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get-latest-indoor'  # Endpoint URL
+    url = 'https://flaskapp9-vukguwbvha-oa.a.run.app/get-latest-indoor'  # Endpoint URL
     try:
         response = requests.post(url, json={"passwd": password})
         if response.status_code == 200:
@@ -47,7 +47,7 @@ def fetch_latest_indoor(password):
         return None
 
 def fetch_daily_forecast(city_lat, city_lon, password):
-    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get_daily_forecast'  # Adjust the URL if Flask is running on a different host or port
+    url = 'https://flaskapp9-vukguwbvha-oa.a.run.app/get_daily_forecast'  # Adjust the URL if Flask is running on a different host or port
     headers = {'Content-Type': 'application/json'}
     data = {
         "passwd": password,
@@ -66,7 +66,7 @@ def fetch_daily_forecast(city_lat, city_lon, password):
         return None
 
 def fetch_hourly_max(password):
-    response = requests.post("https://flaskapp8-vukguwbvha-oa.a.run.app/hourly-max", json={"passwd": password})
+    response = requests.post("https://flaskapp9-vukguwbvha-oa.a.run.app/hourly-max", json={"passwd": password})
     if response.status_code == 200:
         return response.json()
     else:
@@ -74,7 +74,7 @@ def fetch_hourly_max(password):
         return None 
 
 def fetch_min_avg_max(password):
-    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get-min-avg-max'
+    url = 'https://flaskapp9-vukguwbvha-oa.a.run.app/get-min-avg-max'
     try:
         response = requests.post(url, json={"passwd": password})
         if response.status_code == 200:
@@ -87,7 +87,7 @@ def fetch_min_avg_max(password):
         return None
 
 def fetch_min_avg_max_outdoor(password):
-    url = 'https://flaskapp8-vukguwbvha-oa.a.run.app/get-min-avg-max-outdoor'
+    url = 'https://flaskapp9-vukguwbvha-oa.a.run.app/get-min-avg-max-outdoor'
     try:
         response = requests.post(url, json={"passwd": password})
         if response.status_code == 200:
@@ -100,7 +100,7 @@ def fetch_min_avg_max_outdoor(password):
         return None
 
 def fetch_tvoc_co2(password):
-    url = 'http://127.0.0.1:8080/get-tvoc-co2'
+    url = 'https://flaskapp9-vukguwbvha-oa.a.run.app/get-tvoc-co2'
     response = requests.post(url, json={"passwd": password})
     return response.json()
 
