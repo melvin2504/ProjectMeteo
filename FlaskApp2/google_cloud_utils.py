@@ -148,13 +148,13 @@ def fetch_min_avg_max_outdoor(client):
 
 def fetch_tvoc_co2(client):
     query = """
-    SELECT 
-        TIMESTAMP_TRUNC(time, HOUR) as datetime,
-        AVG(indoor_humidity) as indoor_humidity,
-        AVG(indoor_eco2) as indoor_eco2,
-        AVG(indoor_tvoc) as indoor_tvoc
+SELECT 
+        TIMESTAMP_TRUNC(TIMESTAMP(CONCAT(date, ' ', time)), HOUR) AS datetime,
+        AVG(indoor_humidity) AS indoor_humidity,
+        AVG(indoor_eco2) AS indoor_eco2,
+        AVG(indoor_tvoc) AS indoor_tvoc
     FROM `lab-test-1-415115.weather_IoT_data.weather-records`
-    WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
+    WHERE TIMESTAMP(CONCAT(date, ' ', time)) >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 7 DAY)
     GROUP BY datetime
     ORDER BY datetime DESC
     """
