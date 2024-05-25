@@ -161,6 +161,8 @@ The welcome page of the dashboard, named "current_weather.png", provides an over
 - A weather forecast for the upcoming days with icons representing different weather conditions.
 - Current outdoor weather, including temperature and cloud conditions.
 - Current indoor data, such as indoor temperature, humidity, Total Volatile Organic Compounds (TVOC) level, and equivalent CO2 (eCO2) level.
+**Note:** For a better experience, use the dashboard in dark mode.
+
 
 ### Graphs Page
 
