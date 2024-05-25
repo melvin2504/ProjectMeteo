@@ -15,7 +15,7 @@ Welcome to our project repository ! This project involves implementing an indoor
   - [Local Deployment](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-local-deployment)
   - [Device Configuration](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-device-configuration)
 - [Project Structure](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-project-structure)
-- [Dashboard Overview](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-dashboard-overview)
+- [Dashboard Overview](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#%EF%B8%8F-dashboard-overview)
 - [3D Printing Your M5Stack Core2 Holder](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#%EF%B8%8F-3d-printing-your-m5stack-core2-holder)
 - [Video Demonstration](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-video-demonstration)
 
