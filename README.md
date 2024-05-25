@@ -153,7 +153,7 @@ By following these steps, you'll have a robust deployment of your weather monito
 
 ### Welcome Page
 
-![Current Weather](current_weather.PNG)
+![Current Weather](/images/current_weather.PNG)
 
 The welcome page of the dashboard, named "current_weather.png", provides an overview of the current weather conditions and indoor data. It displays:
 - The date and day of the week.
@@ -165,20 +165,21 @@ The welcome page of the dashboard, named "current_weather.png", provides an over
 
 The graphs page contains several visual representations of weather data collected over time. Below are the graphs in the order they appear:
 
-![Heatmap of Max Outdoor Humidity](graphics_1.PNG)
+![Heatmap of Max Outdoor Humidity](/images/graphics_1.PNG)
 The "Heatmap of Max Outdoor Humidity" shows the maximum outdoor humidity levels across different hours of the day for the past week.
 
-![Indoor Temperature](graphics_2.PNG)
+![Indoor Temperature](/images/graphics_2.PNG)
 This graph depicts the indoor temperature variations (minimum, average, and maximum) recorded every 3 hours over the last 7 days.
 
-![Outdoor Temperature](graphics_3.PNG)
+![Outdoor Temperature](/images/graphics_3.PNG)
 Similar to the indoor temperature graph, this one shows the outdoor temperature variations (minimum, average, and maximum) recorded every 3 hours over the last 7 days.
 
-![Indoor Conditions Over Time](graphics_4.PNG)
+![Indoor Conditions Over Time](/images/graphics_4.PNG)
 The "Indoor Conditions Over Time" graph tracks the indoor humidity percentage, CO2 levels (in ppm), and TVOC levels (in ppb) over a specified period.
 
-![Heatmap of Max Outdoor Temperature](graphics_5.PNG)
+![Heatmap of Max Outdoor Temperature](/images/graphics_5.PNG)
 Lastly, the "Heatmap of Max Outdoor Temperature" displays the maximum outdoor temperature across different hours of the day for the past week.
+
 
 
 ## 🖨️ 3D Printing Your M5Stack Core2 Holder
