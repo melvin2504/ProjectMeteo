@@ -75,6 +75,12 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - In the BigQuery console, click on your project name and select "Create Dataset".
    - Provide a dataset ID and set other configurations as needed, then click 'Create'.
 
+   <br>
+<div align="center">
+  <img src="images/bigquery.PNG" alt="bq" width="200"/>
+</div>
+<br>
+
 #### Step 2: Obtain Google Cloud Credentials
 1. **Create Service Account**:
    - Go to "IAM & Admin" > "Service accounts".
