@@ -91,6 +91,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
    - Build your container image using Google Cloud Build or your local machine.
      ```sh
+     git clone https://github.com/melvin2504/ProjectMeteo.git
      cd ProjectMeteo
      cd FlaskApp
      docker build -t eu.gcr.io/your-project-id/flaskapp:latest .
