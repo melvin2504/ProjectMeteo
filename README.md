@@ -221,4 +221,4 @@ After printing, you can place your Core2 on the holder and attach the sensor to 
 This custom holder is an excellent way to enhance the usability of your M5Stack Core2 device, making it easy to interact with and adding an extra layer of stability and protection.
 
 ## 🎥 Video Demonstration
-- Check out our [YouTube video demonstration](https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUJcmljayByb2xs) to see the project in action!
+- Check out our [YouTube video demonstration](https://youtu.be/iw7W7-BSsUc) to see the project in action!
