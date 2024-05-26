@@ -12,7 +12,6 @@ Welcome to our project repository ! This project involves implementing an indoor
 - [Hardware and Software Requirements](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-hardware-and-software-requirements)
 - [Setup and Deployment Instructions](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-setup-and-deployment-instructions)
   - [Google Cloud Deployment Instructions](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-google-cloud-deployment-instructions)
-  - [Local Deployment](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-local-deployment)
   - [Device Configuration](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-device-configuration)
 - [Project Structure](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#-project-structure)
 - [Dashboard Overview](https://github.com/melvin2504/ProjectMeteo/blob/main/README.md#%EF%B8%8F-dashboard-overview)
