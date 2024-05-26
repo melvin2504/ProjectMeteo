@@ -86,7 +86,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Go to "Keys" tab and click on "Add Key" > "Create new key".
    - Choose JSON and download the key file. This is your `google_credentials.json`. This will be usefull for a local use.
 
-#### Step 3: Deploy Application Using Google Cloud Run
+#### Step 3: Deploy Backend Using Google Cloud Run
 1. **Containerize Your Application**:
    - Set up environment variables for Google Cloud and OpenWeatherMap in config.py.
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
