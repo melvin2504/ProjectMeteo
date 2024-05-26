@@ -15,11 +15,11 @@ wifi_credentials = [
 ]
 
 # Google Cloud Endpoints
-OUTDOOR_WEATHER_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/get_outdoor_weather'
-GENERATE_ADVICE_AUDIO_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/generate_advice_audio'
-GET_DAILY_FORECAST_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/get_daily_forecast'
-HISTORICAL_DATA_GRAPH_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/historical_data_graph'
-SEND_TO_BIGQUERY_URL = 'https://flaskapp7-vukguwbvha-oa.a.run.app/send-to-bigquery'
+OUTDOOR_WEATHER_URL = 'https://flaskapp10-vukguwbvha-oa.a.run.app/get_outdoor_weather'
+GENERATE_ADVICE_AUDIO_URL = 'https://flaskapp10-vukguwbvha-oa.a.run.app/generate_advice_audio'
+GET_DAILY_FORECAST_URL = 'https://flaskapp10-vukguwbvha-oa.a.run.app/get_daily_forecast'
+HISTORICAL_DATA_GRAPH_URL = 'https://flaskapp10-vukguwbvha-oa.a.run.app/historical_data_graph'
+SEND_TO_BIGQUERY_URL = 'https://flaskapp10-vukguwbvha-oa.a.run.app/send-to-bigquery'
 
 # Password hash (example hash)
 passwd_hash = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
