@@ -3,7 +3,7 @@ from google.cloud import bigquery, texttospeech
 from openai_utils import generate_weather_advice
 from weather import get_weather, get_daily_forecast, weather_icons
 from google_cloud_utils import insert_data_to_bigquery, query_latest_weather, query_latest_data, fetch_min_avg_max_outdoor, fetch_min_avg_max, fetch_hourly_max_for_last_7_days, fetch_tvoc_co2
-from config import OPENWEATHER_API_KEY, YOUR_HASH_PASSWD, GCP_PROJECT_ID, DATASET_ID, TABLE_ID
+from config import OPENWEATHER_API_KEY, YOUR_HASH_PASSWD, GCP_PROJECT_ID, DATASET_ID, TABLE_ID, CITY
 from PIL import Image
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -52,7 +52,7 @@ def send_to_bigquery():
         return jsonify({"error": "Incorrect Password!"}), 401
 
     # Fetch the weather data
-    city = "YOUR CITY"
+    city = CITY
     weather_data = get_weather(OPENWEATHER_API_KEY, city)
     if weather_data is None:
         return jsonify({"error": "Failed to fetch weather data"}), 500
