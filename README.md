@@ -77,7 +77,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
 
    <br>
 <div align="center">
-  <img src="images/bigquery.PNG" alt="bq" width="200"/>
+  <img src="images/bigquery.PNG" alt="bq" width="500"/>
 </div>
 <br>
 
