@@ -168,6 +168,8 @@ By following these steps, you'll have a robust deployment of your weather monito
 
 ![Current Weather](/images/current_weather.PNG)
 
+Use the dashboard by clicking [here](https://streamlit3-vukguwbvha-oa.a.run.app).
+
 The welcome page of the dashboard, provides an overview of the current weather conditions and indoor data. It displays:
 - The date and day of the week.
 - A weather forecast for the upcoming days with icons representing different weather conditions.
