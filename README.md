@@ -105,6 +105,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
 4. **Deploy to Cloud Run**:
    - Select your image from Container Registry, configure the service settings.
    - Click 'Create' to deploy. Cloud Run will provide a URL to access your deployed application.
+  <div align="center">
   <br>
    <img src="images/deploy7.PNG" alt="Deploy" style="width: 100%;">
  <br>
@@ -112,6 +113,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
  <br>
    <img src="images/deploy9.PNG" alt="Deploy" style="width: 50%;">
  <br>
+  </div>
 #### Step 4: Accessing the Application
 - Once deployed, access the application via the URL provided by Cloud Run. It will be the endpoint to use in your Micropython code for your M5Stack in order to use backend services.
 
