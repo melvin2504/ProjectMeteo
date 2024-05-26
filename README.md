@@ -99,8 +99,10 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Use `gcloud` commands to push the image to Google Cloud. For example:
      ```sh
      gcloud auth configure-docker
-     docker push gcr.io/your-project-id/flaskapp
+     docker push eu.gcr.io/your-project-id/flaskapp
      ```
+
+     <img src="images/deploy7.PNG" alt="Deploy" style="width: 100%;">
 
 4. **Deploy to Cloud Run**:
    - Select your image from Container Registry, configure the service settings.
