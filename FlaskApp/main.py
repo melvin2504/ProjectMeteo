@@ -12,7 +12,7 @@ import tempfile
 import os
 
 # Uncomment the line below if you want to run your flask app locally.
-# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./lab-test-1-415115-c2f0b755d8b4.json"
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "YOUR JSON FILE"
 
 app = Flask(__name__)
 
