@@ -113,7 +113,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
 
 By following these steps, you'll have a robust deployment of your weather monitoring application running on Google Cloud, leveraging its powerful services for scalability and performance.
 
-#### Step 1: Deploy Dashboard Using Google Cloud Run
+#### Step 5: Deploy Dashboard Using Google Cloud Run
 1. **Containerize Your Application**:
    - Set up endpoints variables in `streamlit_app.py`.
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
