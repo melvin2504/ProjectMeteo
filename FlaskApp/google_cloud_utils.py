@@ -2,16 +2,16 @@ from google.cloud import bigquery
 from google.cloud import texttospeech
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, Response
-
+import config 
 import pandas as pd
 
 def insert_data_to_bigquery(client, data):
-        # Prepare the query to insert data into BigQuery
+    # Prepare the query to insert data into BigQuery
     fields = ', '.join(data.keys())
     values = ', '.join([f"'{v}'" if isinstance(v, str) else str(v) for v in data.values()])
     
     query = f"""
-    INSERT INTO `lab-test-1-415115.weather_IoT_data.weather-records` ({fields})
+    INSERT INTO `{config.GCP_PROJECT_ID}.{config.DATASET_ID}.{config.TABLE_ID}` ({fields})
     VALUES ({values})
     """
     try:
@@ -22,10 +22,10 @@ def insert_data_to_bigquery(client, data):
         return jsonify({"error": str(e)}), 500
 
 # Function to query the latest data from BigQuery
-def query_latest_data(client, project_id, dataset_id, table_id):
+def query_latest_data(client):
     query = f"""
         SELECT *
-        FROM `{project_id}.{dataset_id}.{table_id}`
+        FROM `{config.GCP_PROJECT_ID}.{config.DATASET_ID}.{config.TABLE_ID}`
         ORDER BY date DESC, time DESC
         LIMIT 25
     """
@@ -40,14 +40,13 @@ def query_latest_data(client, project_id, dataset_id, table_id):
     # Sort DataFrame by datetime
     df = df.sort_values(by='datetime')
     
-
     return df
 
 def query_latest_weather(client):
     """Fetches the latest weather data from BigQuery."""
-    query = """
+    query = f"""
     SELECT outdoor_temp, outdoor_humidity, outdoor_weather
-    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
+    FROM `{config.GCP_PROJECT_ID}.{config.DATASET_ID}.{config.TABLE_ID}`
     ORDER BY date desc, time desc limit 1
     """
     query_job = client.query(query)
@@ -63,12 +62,12 @@ def query_latest_weather(client):
         raise Exception("No data available")
 
 def fetch_hourly_max_for_last_7_days(client):
-    query = """
+    query = f"""
     SELECT 
         DATETIME_TRUNC(DATETIME(date, time), HOUR) as hour, 
         MAX(outdoor_temp) as max_outdoor_temp, 
         MAX(outdoor_humidity) as max_outdoor_humidity
-    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
+    FROM `{config.GCP_PROJECT_ID}.{config.DATASET_ID}.{config.TABLE_ID}`
     WHERE DATETIME(date, time) >= DATETIME_SUB(CURRENT_DATETIME(), INTERVAL 7 DAY)
     GROUP BY hour
     ORDER BY hour DESC
@@ -85,12 +84,12 @@ def fetch_hourly_max_for_last_7_days(client):
     return hourly_data
 
 def fetch_min_avg_max(client):
-    query = """
+    query = f"""
     SELECT
       TIMESTAMP(DATETIME(date, time)) AS datetime,
       indoor_temp
     FROM
-      `lab-test-1-415115.weather_IoT_data.weather-records`
+      `{config.GCP_PROJECT_ID}.{config.DATASET_ID}.{config.TABLE_ID}`
     WHERE
       date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
     ORDER BY
@@ -116,12 +115,12 @@ def fetch_min_avg_max(client):
     return result
 
 def fetch_min_avg_max_outdoor(client):
-    query = """
+    query = f"""
     SELECT
       TIMESTAMP(DATETIME(date, time)) AS datetime,
       outdoor_temp
     FROM
-      `lab-test-1-415115.weather_IoT_data.weather-records`
+      `{config.GCP_PROJECT_ID}.{config.DATASET_ID}.{config.TABLE_ID}`
     WHERE
       date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
     ORDER BY
@@ -147,13 +146,13 @@ def fetch_min_avg_max_outdoor(client):
     return result
 
 def fetch_tvoc_co2(client):
-    query = """
+    query = f"""
 SELECT 
         TIMESTAMP_TRUNC(TIMESTAMP(CONCAT(date, ' ', time)), HOUR) AS datetime,
         AVG(indoor_humidity) AS indoor_humidity,
         AVG(indoor_eco2) AS indoor_eco2,
         AVG(indoor_tvoc) AS indoor_tvoc
-    FROM `lab-test-1-415115.weather_IoT_data.weather-records`
+    FROM `{config.GCP_PROJECT_ID}.{config.DATASET_ID}.{config.TABLE_ID}`
     WHERE TIMESTAMP(CONCAT(date, ' ', time)) >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 7 DAY)
     GROUP BY datetime
     ORDER BY datetime DESC
