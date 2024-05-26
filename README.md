@@ -91,6 +91,8 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
    - Build your container image using Google Cloud Build or your local machine.
      ```sh
+     cd ProjectMeteo
+     cd FlaskApp
      docker build -t eu.gcr.io/your-project-id/flaskapp:latest .
      ```
 
@@ -114,6 +116,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    <img src="images/deploy9.PNG" alt="Deploy" style="width: 50%;">
  <br>
   </div>
+
 #### Step 4: Accessing the Application
 - Once deployed, access the application via the URL provided by Cloud Run. It will be the endpoint to use in your Micropython code for your M5Stack in order to use backend services.
 
@@ -177,6 +180,9 @@ The "Indoor Conditions Over Time" graph tracks the indoor humidity percentage, C
 
 ![Heatmap of Max Outdoor Temperature](/images/graphics_5.PNG)
 Lastly, the "Heatmap of Max Outdoor Temperature" displays the maximum outdoor temperature across different hours of the day for the past week.
+
+### How to deploy it
+#### Step 1: Set Up Google Cloud Project
 
 
 
