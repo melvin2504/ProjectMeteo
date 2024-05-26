@@ -183,8 +183,36 @@ The "Indoor Conditions Over Time" graph tracks the indoor humidity percentage, C
 Lastly, the "Heatmap of Max Outdoor Temperature" displays the maximum outdoor temperature across different hours of the day for the past week.
 
 ### How to deploy it
-#### Step 1: Set Up Google Cloud Project
-
+#### Step 1: Deploy Application Using Google Cloud Run
+1. **Containerize Your Application**:
+   - Set up endpoints variables in `streamlit_app.py`.
+   - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
+   - Build your container image using Google Cloud Build or your local machine.
+     ```sh
+     git clone https://github.com/melvin2504/ProjectMeteo.git
+     cd ProjectMeteo
+     cd StreamlitApp
+     docker build -t eu.gcr.io/your-project-id/streamlit:latest .
+     ```
+2. **Push the Container to Container Registry**:
+   - Tag your built image appropriately for Google Container Registry.
+   - Use `gcloud` commands to push the image to Google Cloud. For example:
+     ```sh
+     gcloud auth configure-docker
+     docker push eu.gcr.io/your-project-id/streamlit
+     ```
+3. **Deploy to Cloud Run**:
+   - Select your image from Container Registry, configure the service settings.
+   - Click 'Create' to deploy. Cloud Run will provide a URL to access your deployed application.
+  <div align="center">
+  <br>
+   <img src="images/deploystreamlit4.PNG" alt="Deploy" style="width: 100%;">
+ <br>
+   <img src="images/deploystreamlit5.PNG" alt="Deploy" style="width: 100%;">
+ <br>
+   <img src="images/deploystreamlit6.PNG" alt="Deploy" style="width: 50%;">
+ <br>
+  </div>
 
 
 ## 🖨️ 3D Printing Your M5Stack Core2 Holder
