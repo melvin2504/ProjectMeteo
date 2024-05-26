@@ -10,46 +10,66 @@ import requests
 from PIL import Image
 import pytz
 
+# Constants and Configuration
 YOUR_HASH_PASSWD = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f2cab"
-# Setting BASE_DIR to the parent directory of the directory where the script file resides
 BASE_DIR = Path(__file__).resolve().parent
-ICON_DIR = os.path.join(BASE_DIR, 'Icons')  # Correct path to the Icons folder
-IMAGE_DIR = os.path.join(BASE_DIR, 'images')  # Correct path to the Images folder
+ICON_DIR = os.path.join(BASE_DIR, 'Icons')
+IMAGE_DIR = os.path.join(BASE_DIR, 'images')
+
+# Abstracted URL Endpoints
+BASE_URL = 'https://flaskapp10-vukguwbvha-oa.a.run.app'
+GET_LATEST_TEMPERATURE_URL = f'{BASE_URL}/get-latest-temperature'
+GET_OUTDOOR_WEATHER_URL = f'{BASE_URL}/get_outdoor_weather'
+GET_LATEST_INDOOR_URL = f'{BASE_URL}/get-latest-indoor'
+GET_DAILY_FORECAST_URL = f'{BASE_URL}/get_daily_forecast'
+GET_HOURLY_MAX_URL = f'{BASE_URL}/hourly-max'
+GET_MIN_AVG_MAX_URL = f'{BASE_URL}/get-min-avg-max'
+GET_MIN_AVG_MAX_OUTDOOR_URL = f'{BASE_URL}/get-min-avg-max-outdoor'
+GET_TVOC_CO2_URL = f'{BASE_URL}/get-tvoc-co2'
 
 def fetch_latest_temperature():
-    url = 'https://flaskapp10-vukguwbvha-oa.a.run.app/get-latest-temperature'  # Endpoint URL
+    """
+    Fetch the latest indoor temperature from the server.
+    """
     try:
-        response = requests.get(url)
+        response = requests.get(GET_LATEST_TEMPERATURE_URL)
         if response.status_code == 200:
-            return response.json()['temperature']  # Assumes the response is {'temperature': value}
+            return response.json()['temperature']
         else:
             return None
     except requests.exceptions.RequestException as e:
-        st.error('Failed to fetch latest temperature: {}'.format(e))
+        st.error(f'Failed to fetch latest temperature: {e}')
         return None
 
 def fetch_outdoor_weather(password):
-    response = requests.post('https://flaskapp10-vukguwbvha-oa.a.run.app/get_outdoor_weather', json={"passwd": password})
+    """
+    Fetch the current outdoor weather from the server.
+    """
+    response = requests.post(GET_OUTDOOR_WEATHER_URL, json={"passwd": password})
     if response.status_code == 200:
         return response.json()
     else:
         st.error("Failed to fetch outdoor weather data")
         return None
-    
+
 def fetch_latest_indoor(password):
-    url = 'https://flaskapp10-vukguwbvha-oa.a.run.app/get-latest-indoor'  # Endpoint URL
+    """
+    Fetch the latest indoor data (temperature, humidity, etc.) from the server.
+    """
     try:
-        response = requests.post(url, json={"passwd": password})
+        response = requests.post(GET_LATEST_INDOOR_URL, json={"passwd": password})
         if response.status_code == 200:
             return response.json()
         else:
             return None
     except requests.exceptions.RequestException as e:
-        st.error('Failed to fetch latest indoor data: {}'.format(e))
+        st.error(f'Failed to fetch latest indoor data: {e}')
         return None
 
 def fetch_daily_forecast(city_lat, city_lon, password):
-    url = 'https://flaskapp10-vukguwbvha-oa.a.run.app/get_daily_forecast'  # Adjust the URL if Flask is running on a different host or port
+    """
+    Fetch the daily weather forecast for a specific location.
+    """
     headers = {'Content-Type': 'application/json'}
     data = {
         "passwd": password,
@@ -59,26 +79,30 @@ def fetch_daily_forecast(city_lat, city_lon, password):
         }
     }
 
-    response = requests.post(url, json=data, headers=headers)
+    response = requests.post(GET_DAILY_FORECAST_URL, json=data, headers=headers)
     if response.status_code == 200:
-        forecast = response.json()
-        return forecast
+        return response.json()
     else:
         st.error(f"Failed to retrieve forecast: {response.json().get('error', 'Unknown error')}")
         return None
 
 def fetch_hourly_max(password):
-    response = requests.post("https://flaskapp10-vukguwbvha-oa.a.run.app/hourly-max", json={"passwd": password})
+    """
+    Fetch hourly maximum temperature data.
+    """
+    response = requests.post(GET_HOURLY_MAX_URL, json={"passwd": password})
     if response.status_code == 200:
         return response.json()
     else:
         st.error("Failed to fetch hourly max data")
-        return None 
+        return None
 
 def fetch_min_avg_max(password):
-    url = 'https://flaskapp10-vukguwbvha-oa.a.run.app/get-min-avg-max'
+    """
+    Fetch minimum, average, and maximum indoor temperature data.
+    """
     try:
-        response = requests.post(url, json={"passwd": password})
+        response = requests.post(GET_MIN_AVG_MAX_URL, json={"passwd": password})
         if response.status_code == 200:
             return response.json()
         else:
@@ -89,9 +113,11 @@ def fetch_min_avg_max(password):
         return None
 
 def fetch_min_avg_max_outdoor(password):
-    url = 'https://flaskapp10-vukguwbvha-oa.a.run.app/get-min-avg-max-outdoor'
+    """
+    Fetch minimum, average, and maximum outdoor temperature data.
+    """
     try:
-        response = requests.post(url, json={"passwd": password})
+        response = requests.post(GET_MIN_AVG_MAX_OUTDOOR_URL, json={"passwd": password})
         if response.status_code == 200:
             return response.json()
         else:
@@ -102,11 +128,16 @@ def fetch_min_avg_max_outdoor(password):
         return None
 
 def fetch_tvoc_co2(password):
-    url = 'https://flaskapp10-vukguwbvha-oa.a.run.app/get-tvoc-co2'
-    response = requests.post(url, json={"passwd": password})
+    """
+    Fetch indoor TVOC and CO2 levels.
+    """
+    response = requests.post(GET_TVOC_CO2_URL, json={"passwd": password})
     return response.json()
 
 def render_basic_bar():
+    """
+    Render a basic bar chart showing temperature and humidity.
+    """
     option = {
         "backgroundColor": 'transparent',
         "xAxis": {
@@ -114,21 +145,26 @@ def render_basic_bar():
             "data": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         },
         "yAxis": [
-            {"type": "value", "name": "Temperature"},  # First y-axis for temperature
-            {"type": "value", "name": "Humidity", "axisLabel": {"formatter": '{value}%'}, "min": 0, "max": 100}  # Second y-axis for humidity
+            {"type": "value", "name": "Temperature"},
+            {"type": "value", "name": "Humidity", "axisLabel": {"formatter": '{value}%'}, "min": 0, "max": 100}
         ],
         "series": [
             {"data": [820, 932, 901, 934, 1290, 1330, 1320], "type": "line", "name": "Temperature", "itemStyle": {"color": "red"}},
             {"data": [45, 50, 55, 60, 65, 70, 75], "type": "bar", "yAxisIndex": 1, "name": "Humidity", "itemStyle": {"color": "navy"}}
         ],
-
     }
     st_echarts(options=option, height="400px")
 
 def round_time_to_nearest_hour(time):
+    """
+    Round the given time to the nearest hour.
+    """
     return (time + timedelta(minutes=30)).replace(minute=0, second=0, microsecond=0)
 
 def plot_temperature_stats(data, title):
+    """
+    Plot temperature statistics (min, avg, max) using Echarts.
+    """
     if data:
         df = pd.DataFrame(data)
         df['datetime'] = pd.to_datetime(df['datetime'])
@@ -227,23 +263,20 @@ def plot_temperature_stats(data, title):
         st_echarts(options=options, height="500px")
 
 def render_heatmap_2(data):
+    """
+    Render a heatmap showing the max outdoor temperature and humidity for the last 7 days.
+    """
     if data:
-        # Convert the data into a DataFrame
         df = pd.DataFrame(data)
         df['hour'] = pd.to_datetime(df['hour'])
 
-        # Define the timezone for UTC+1
         local_tz = pytz.timezone('Etc/GMT-1')
-
-        # Convert 'hour' column to local time and round to nearest hour
         df['hour'] = df['hour'].apply(lambda x: round_time_to_nearest_hour(x + timedelta(hours=1)))
 
-        # Generate list of the last 7 days with hours
         end_date = datetime.now(local_tz)
         start_date = end_date - timedelta(days=6)
         days = [(end_date - timedelta(days=i)).strftime('%A') for i in range(7)][::-1]
 
-        # Specified hours for display
         hours = [
             '12am', '1am', '2am', '3am', '4am', '5am', '6am',
             '7am', '8am', '9am', '10am', '11am',
@@ -251,11 +284,9 @@ def render_heatmap_2(data):
             '6pm', '7pm', '8pm', '9pm', '10pm', '11pm'
         ]
 
-        # Create a dictionary to hold the hourly max data
         temp_dict = {(day, hour): None for day in days for hour in hours}
         humidity_dict = {(day, hour): None for day in days for hour in hours}
 
-        # Fill the dictionary with the max values for each hour
         for _, row in df.iterrows():
             day_str = row['hour'].strftime('%A')
             hour_str = row['hour'].strftime('%I%p').lstrip('0').lower()
@@ -264,7 +295,6 @@ def render_heatmap_2(data):
             if humidity_dict[(day_str, hour_str)] is None or row['max_outdoor_humidity'] > humidity_dict[(day_str, hour_str)]:
                 humidity_dict[(day_str, hour_str)] = row['max_outdoor_humidity']
 
-        # Prepare data for the heatmap
         temp_data = []
         humidity_data = []
         for day in days:
@@ -276,14 +306,13 @@ def render_heatmap_2(data):
                 if humidity_value is not None:
                     humidity_data.append([hours.index(hour), days.index(day), int(humidity_value)])
 
-        # Define heatmap options for temperature
         temp_heatmap_options = {
-            "backgroundColor": "#0e1117",  # Set the background to dark
+            "backgroundColor": "#0e1117",
             "tooltip": {
                 "position": "top",
                 "formatter": 'Temp: {c} °C',
                 "textStyle": {
-                    "color": "#fff"  # Tooltip text color
+                    "color": "#fff"
                 }
             },
             "grid": {
@@ -299,11 +328,11 @@ def render_heatmap_2(data):
                 },
                 "axisLine": {
                     "lineStyle": {
-                        "color": "#fff"  # X-axis line color
+                        "color": "#fff"
                     }
                 },
                 "axisLabel": {
-                    "color": "#fff"  # X-axis label color
+                    "color": "#fff"
                 }
             },
             "yAxis": {
@@ -314,11 +343,11 @@ def render_heatmap_2(data):
                 },
                 "axisLine": {
                     "lineStyle": {
-                        "color": "#fff"  # Y-axis line color
+                        "color": "#fff"
                     }
                 },
                 "axisLabel": {
-                    "color": "#fff"  # Y-axis label color
+                    "color": "#fff"
                 }
             },
             "visualMap": {
@@ -329,10 +358,10 @@ def render_heatmap_2(data):
                 "left": "center",
                 "bottom": "15%",
                 "inRange": {
-                    "color": ['#3c8dbc', '#d35400']  # Color gradient for the heatmap
+                    "color": ['#3c8dbc', '#d35400']
                 },
                 "textStyle": {
-                    "color": "#fff"  # Visual map text color
+                    "color": "#fff"
                 }
             },
             "series": [{
@@ -341,7 +370,7 @@ def render_heatmap_2(data):
                 "data": temp_data,
                 "label": {
                     "show": True,
-                    "color": "#fff"  # Label color
+                    "color": "#fff"
                 },
                 "emphasis": {
                     "itemStyle": {
@@ -352,14 +381,13 @@ def render_heatmap_2(data):
             }]
         }
 
-        # Define heatmap options for humidity
         humidity_heatmap_options = {
-            "backgroundColor": "#0e1117",  # Set the background to dark
+            "backgroundColor": "#0e1117",
             "tooltip": {
                 "position": "top",
                 "formatter": 'Humidity: {c} %',
                 "textStyle": {
-                    "color": "#fff"  # Tooltip text color
+                    "color": "#fff"
                 }
             },
             "grid": {
@@ -375,11 +403,11 @@ def render_heatmap_2(data):
                 },
                 "axisLine": {
                     "lineStyle": {
-                        "color": "#fff"  # X-axis line color
+                        "color": "#fff"
                     }
                 },
                 "axisLabel": {
-                    "color": "#fff"  # X-axis label color
+                    "color": "#fff"
                 }
             },
             "yAxis": {
@@ -390,11 +418,11 @@ def render_heatmap_2(data):
                 },
                 "axisLine": {
                     "lineStyle": {
-                        "color": "#fff"  # Y-axis line color
+                        "color": "#fff"
                     }
                 },
                 "axisLabel": {
-                    "color": "#fff"  # Y-axis label color
+                    "color": "#fff"
                 }
             },
             "visualMap": {
@@ -405,10 +433,10 @@ def render_heatmap_2(data):
                 "left": "center",
                 "bottom": "15%",
                 "inRange": {
-                    "color": ['#D0E6F5', '#3399FF']  # Blue gradient for the heatmap
+                    "color": ['#D0E6F5', '#3399FF']
                 },
                 "textStyle": {
-                    "color": "#fff"  # Visual map text color
+                    "color": "#fff"
                 }
             },
             "series": [{
@@ -417,7 +445,7 @@ def render_heatmap_2(data):
                 "data": humidity_data,
                 "label": {
                     "show": True,
-                    "color": "#fff"  # Label color
+                    "color": "#fff"
                 },
                 "emphasis": {
                     "itemStyle": {
@@ -428,7 +456,6 @@ def render_heatmap_2(data):
             }]
         }
 
-        # Render heatmaps
         st.write("## Heatmap of Max Outdoor Temperature")
         st_echarts(options=temp_heatmap_options, height="500px")
 
@@ -436,12 +463,14 @@ def render_heatmap_2(data):
         st_echarts(options=humidity_heatmap_options, height="500px")
 
 def display_outdoor_weather(weather_data):
+    """
+    Display the current outdoor weather with icons and metrics.
+    """
     if weather_data:
         st.write("### Current Outdoor Weather")
 
         cols = st.columns(3)
         
-        # Display weather icon and description
         icon_path = os.path.join(ICON_DIR, f"{weather_data['icon_code']}.png")
         with cols[0]:
             if os.path.exists(icon_path):
@@ -451,7 +480,6 @@ def display_outdoor_weather(weather_data):
                 st.error(f"Icon file {icon_path} not found.")
             st.write(f"**{weather_data['outdoor_weather'].capitalize()}**")
         
-        # Display temperature icon and value
         temp_icon_path = os.path.join(IMAGE_DIR, "icons8-temperature-32_white.png")
         with cols[1]:
             if os.path.exists(temp_icon_path):
@@ -461,7 +489,6 @@ def display_outdoor_weather(weather_data):
                 st.error(f"Temperature icon file {temp_icon_path} not found.")
             st.write(f"{weather_data['outdoor_temp']} °C")
 
-        # Display humidity icon and value
         humidity_icon_path = os.path.join(IMAGE_DIR, "icons8-humidity-32_white.png")
         with cols[2]:
             if os.path.exists(humidity_icon_path):
@@ -470,9 +497,11 @@ def display_outdoor_weather(weather_data):
             else:
                 st.error(f"Humidity icon file {humidity_icon_path} not found.")
             st.write(f"{weather_data['outdoor_humidity']} %")
-        
+
 def display_forecast(forecast_data):
-    # Using columns in Streamlit to display each piece of data
+    """
+    Display the weather forecast for the upcoming days.
+    """
     cols = st.columns(len(forecast_data))
     days = [datetime.strptime(day['date'], "%Y-%m-%d").strftime('%a') for day in forecast_data]
     temps = [f"{round(day['min_temperature'])}°C / {round(day['max_temperature'])}°C" for day in forecast_data]
@@ -482,10 +511,13 @@ def display_forecast(forecast_data):
         with col:
             st.write(day)
             image = Image.open(icon_path)
-            st.image(image)  # Adjust the width as necessary
+            st.image(image)
             st.write(temp)
 
 def display_indoor_data(indoor_data):
+    """
+    Display the current indoor data (temperature, humidity, TVOC, CO2).
+    """
     if indoor_data:
         st.write("### Current Indoor Data")
 
@@ -501,18 +533,17 @@ def display_indoor_data(indoor_data):
             st.metric("Indoor eCO2", f"{indoor_data['indoor_eco2']} ppm")
 
 def plot_indoor_conditions(data):
+    """
+    Plot indoor conditions (humidity, CO2, TVOC) over time.
+    """
     if not data:
         st.warning("No data available to plot.")
         return
 
-    # Convert data to DataFrame
     df = pd.DataFrame(data)
     df['datetime'] = pd.to_datetime(df['datetime'])
-    
-    # Sort the DataFrame by datetime to ensure the oldest date is on the left
     df.sort_values('datetime', inplace=True)
 
-    # Round data to 2 decimal places
     df['indoor_humidity'] = df['indoor_humidity'].round(2)
     df['indoor_eco2'] = df['indoor_eco2'].round(2)
     df['indoor_tvoc'] = df['indoor_tvoc'].round(2)
@@ -655,11 +686,12 @@ def plot_indoor_conditions(data):
         "backgroundColor": "#0e1117"
     }
 
-    # Increase the size of the chart
     st_echarts(options=options, height="600px", width="100%")
 
-
 def main():
+    """
+    Main function to run the Streamlit application.
+    """
     st.set_page_config(layout="wide")
     st.sidebar.title("Navigation")
     st.sidebar.markdown("## Pages")
@@ -681,7 +713,7 @@ def main():
         st.title("Weather Graphics")
         hourly = fetch_hourly_max(YOUR_HASH_PASSWD)
         min_avg_max = fetch_min_avg_max(YOUR_HASH_PASSWD)
-        min_avg_max_outdoor = fetch_min_avg_max_outdoor(YOUR_HASH_PASSWD)   
+        min_avg_max_outdoor = fetch_min_avg_max_outdoor(YOUR_HASH_PASSWD)
         render_heatmap_2(hourly)
         title_indoor = "Indoor temperature (Min, Avg, Max) every 3h for the last 7 days"
         plot_temperature_stats(min_avg_max, title_indoor)
@@ -690,14 +722,5 @@ def main():
         indoor_data = fetch_tvoc_co2(YOUR_HASH_PASSWD)
         plot_indoor_conditions(indoor_data)
 
-
-
-
 if __name__ == "__main__":
     main()
-
-
-
-
-
-#skrr
