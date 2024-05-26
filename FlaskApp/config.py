@@ -6,6 +6,8 @@ YOUR_HASH_PASSWD = "8eac4757d3804403cb4bbd4015df9d2ad252a1e6890605bacb19e5a01a5f
 
 # Google Cloud project ID
 GCP_PROJECT_ID = "lab-test-1-415115"
+DATASET_ID = 'weather_IoT_data'
+TABLE_ID = 'weather-records'
 
 # OpenAI API key
 OPENAI_API_KEY = "sk-proj-ewEynB9LGERMFCdacv2lT3BlbkFJj8xC95U78WlMP1ZZ9Aiu"
