@@ -158,7 +158,7 @@ By following these steps, you'll have a robust deployment of your weather monito
 ### StreamlitApp
 - Python code of the streamlit interface.
 ### images
-- Images of my personal M5Stack used for the readme.
+- Images used for the readme.
 ### 3DStand
 - STL file in order to 3D print the holder.
 
