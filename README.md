@@ -179,7 +179,7 @@ The welcome page of the dashboard, provides an overview of the current weather c
 
 ### Graphs Page
 
-The graphs page contains several visual representations of weather data collected over time. Below are the graphs in the order they appear:
+The graphs page contains several visual representations of weather data collected over time in our BigQuery. Below are the graphs in the order they appear:
 
 ![Heatmap of Max Outdoor Temperature](/images/graphics_1.PNG)
 The "Heatmap of Max Outdoor Temperature" displays the maximum outdoor temperature across different hours of the day for the past week.
