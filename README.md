@@ -91,7 +91,7 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Ensure your project has a `Dockerfile` which includes all necessary instructions to build the image.
    - Build your container image using Google Cloud Build or your local machine.
      ```sh
-     docker build -t eu.gcr.io/your-project-id/your-project-id:latest .
+     docker build -t eu.gcr.io/your-project-id/flaskapp:latest .
      ```
 
 3. **Push the Container to Container Registry**:
@@ -99,31 +99,17 @@ Deploying the application on Google Cloud allows you to utilize powerful cloud-b
    - Use `gcloud` commands to push the image to Google Cloud. For example:
      ```sh
      gcloud auth configure-docker
-     docker push gcr.io/your-project-id/your-project-id
+     docker push gcr.io/your-project-id/flaskapp
      ```
 
 4. **Deploy to Cloud Run**:
-   - Visit the Cloud Run section in Google Cloud Console.
-   - Click "Create Service".
-   - Select your image from Container Registry, configure the service settings like memory, allowed requests, and concurrency.
-   - Set environment variables as needed (e.g., API keys, service account paths).
+   - Select your image from Container Registry, configure the service settings.
    - Click 'Create' to deploy. Cloud Run will provide a URL to access your deployed application.
 
 #### Step 4: Accessing the Application
 - Once deployed, access the application via the URL provided by Cloud Run. It will be the endpoint to use in your Micropython code for your M5Stack in order to use backend services.
 
 By following these steps, you'll have a robust deployment of your weather monitoring application running on Google Cloud, leveraging its powerful services for scalability and performance.
-
-### 💻 Local Deployment
-1. Clone this repository:
-   ```sh
-   git clone https://github.com/melvin2504/ProjectMeteo.git
-   cd ProjectMeteo
-   cd FlaskApp
-2. Install the required Python packages:
-   ```sh
-   pip install -r requirements.txt
-3. Set up environment variables for Google Cloud and OpenWeatherMap in config.py.
 
 ### 📱 Device Configuration
 1. Connect the M5stack Core2 to [M5Flow](https://flow.m5stack.com/) and connect the sensors.
