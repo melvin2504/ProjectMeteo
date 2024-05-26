@@ -153,7 +153,7 @@ By following these steps, you'll have a robust deployment of your weather monito
 
 ![Current Weather](/images/current_weather.PNG)
 
-The welcome page of the dashboard, named "current_weather.png", provides an overview of the current weather conditions and indoor data. It displays:
+The welcome page of the dashboard, provides an overview of the current weather conditions and indoor data. It displays:
 - The date and day of the week.
 - A weather forecast for the upcoming days with icons representing different weather conditions.
 - Current outdoor weather, including temperature and cloud conditions.
