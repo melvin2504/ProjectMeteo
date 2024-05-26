@@ -52,7 +52,7 @@ def send_to_bigquery():
         return jsonify({"error": "Incorrect Password!"}), 401
 
     # Fetch the weather data
-    city = "Lausanne"
+    city = "YOUR CITY"
     weather_data = get_weather(OPENWEATHER_API_KEY, city)
     if weather_data is None:
         return jsonify({"error": "Failed to fetch weather data"}), 500
