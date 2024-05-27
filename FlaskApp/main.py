@@ -156,7 +156,7 @@ def historical_data_graph():
         return jsonify({"error": "Incorrect Password!"}), 401
 
     # Query the latest data from BigQuery
-    filtered_df = query_latest_data(client, GCP_PROJECT_ID, DATASET_ID, TABLE_ID)
+    filtered_df = query_latest_data(client)
     
     # Format datetime column to only show time
     filtered_df['time_only'] = filtered_df['datetime'].dt.strftime('%H:%M:%S')
